@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game-Based Learning | EduPlay - UnityLearn</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="../css/main.css">
+
+  <style>
+    .game-layout-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 2rem;
+    }
+
+    .category-chips {
+      display: flex;
+      gap: 0.65rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .category-chip {
+      padding: 0.55rem 1.2rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition-fast);
+    }
+
+    .category-chip:hover, .category-chip.active {
+      background: var(--primary);
+      border-color: var(--primary-light);
+      color: #FFFFFF;
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    .quizzes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .quiz-card {
+      padding: 1.85rem;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-md);
+      position: relative;
+    }
+
+    .quiz-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .quiz-meta-row {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      margin: 1rem 0 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .quiz-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Badges Showcase Grid */
+    .badges-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+
+    .badge-card {
+      padding: 1.5rem;
+      text-align: center;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .badge-icon-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 0.85rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .badge-card.unlocked .badge-icon-circle {
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .badge-card.locked {
+      opacity: 0.45;
+      filter: grayscale(1);
+    }
+
+    /* Interactive Quiz Modal Specifics */
+    .quiz-option-btn {
+      width: 100%;
+      text-align: left;
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 0.85rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .quiz-option-btn:hover {
+      background: rgba(108, 99, 255, 0.15);
+      border-color: var(--primary);
+    }
+
+    .quiz-option-btn.selected {
+      background: rgba(108, 99, 255, 0.25);
+      border-color: var(--primary-light);
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .quiz-option-key {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .quiz-option-btn.selected .quiz-option-key {
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+
+    @media (max-width: 1100px) {
+      .game-layout-grid {
+        grid-template-columns: 1fr;
+      }
+      .badges-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .quizzes-grid {
+        grid-template-columns: 1fr;
+      }
+      .badges-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Unified Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-brand">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay</span>
+        </a>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="sidebar-heading">Navigation</div>
+        
+        <a href="../dashboard.html" class="nav-link-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="game-learning.html" class="nav-link-item active">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Game Learning</span>
+          <span class="nav-pill">XP</span>
+        </a>
+
+        <a href="simulations.html" class="nav-link-item">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Simulations</span>
+          <span class="nav-pill" style="background: rgba(67, 233, 123, 0.18); color: var(--accent);">Labs</span>
+        </a>
+
+        <a href="learning-paths.html" class="nav-link-item">
+          <i class="fa-solid fa-route"></i>
+          <span>Learning Paths</span>
+        </a>
+
+        <a href="collaborative.html" class="nav-link-item">
+          <i class="fa-solid fa-users"></i>
+          <span>Collaborative</span>
+        </a>
+
+        <a href="analytics.html" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+
+        <a href="authoring.html" class="nav-link-item">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>Authoring</span>
+        </a>
+
+        <div class="sidebar-heading" style="margin-top: 1rem;">System</div>
+        <a href="#" onclick="logout(); return false;" class="nav-link-item" style="color: var(--secondary);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar user-avatar-initials">AH</div>
+          <div class="user-details">
+            <div class="user-name user-name-display">Alex Hunter</div>
+            <div class="user-role user-level-display">Level 12 Scholar</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      
+      <!-- Top Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="quiz-search-input" placeholder="Search quizzes or topics...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="gamification-pill pill-streak user-streak-badge">
+            <i class="fa-solid fa-fire text-secondary"></i> <span>7 Days</span>
+          </div>
+
+          <div class="gamification-pill pill-xp user-xp-badge">
+            <i class="fa-solid fa-bolt text-gold"></i> <span>2,450 XP</span>
+          </div>
+
+          <div class="user-avatar user-avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem; cursor: pointer;">AH</div>
+        </div>
+      </header>
+
+      <!-- Page Body -->
+      <main class="page-container">
+        
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">
+              <i class="fa-solid fa-trophy text-gold"></i>
+              <span>Game-Based Quests & Leaderboard</span>
+            </h1>
+            <p class="page-subtitle">Test your mastery under pressure, earn XP multipliers, and rise to global fame.</p>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-outline btn-sm" onclick="showToast('Daily Quest resets in 5h 22m!', 'info')">
+              <i class="fa-solid fa-clock-rotate-left"></i> Daily Quest (Active)
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Selector Chips -->
+        <div class="category-chips">
+          <div class="category-chip active" data-category="all">All Quests</div>
+          <div class="category-chip" data-category="Programming">Programming & CS</div>
+          <div class="category-chip" data-category="Science">Science & Quantum</div>
+          <div class="category-chip" data-category="Mathematics">Mathematics & Logic</div>
+          <div class="category-chip" data-category="Engineering">Engineering</div>
+        </div>
+
+        <div class="game-layout-grid">
+          
+          <!-- Left Column: Available Quizzes & My Badges -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h2 style="font-size: 1.35rem;">Available Quizzes</h2>
+              <span style="font-size: 0.85rem; color: var(--text-muted);" id="quiz-count-label">3 Available</span>
+            </div>
+
+            <!-- Quiz Grid -->
+            <div class="quizzes-grid" id="quizzes-container">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Badges Section -->
+            <div style="margin-top: 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h2 style="font-size: 1.35rem;">My Trophy Showcase</h2>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Earn badges by scoring 75%+ on qualifying quests.</p>
+              </div>
+              <span class="badge badge-gold">4 / 8 Unlocked</span>
+            </div>
+
+            <div class="badges-grid">
+              <div class="glass-card badge-card unlocked">
+                <div class="badge-icon-circle">🏆</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Algorithm Ace</h4>
+                <p style="font-size: 0.75rem; color: var(--accent); font-weight: 600;">Epic Badge</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Python DSA Mastery</div>
+              </div>
+
+              <div class="glass-card badge-card unlocked">
+                <div class="badge-icon-circle">⚛️</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Quantum Pioneer</h4>
+                <p style="font-size: 0.75rem; color: #8E87FF; font-weight: 600;">Rare Badge</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Dual-Slit Solved</div>
+              </div>
+
+              <div class="glass-card badge-card unlocked">
+                <div class="badge-icon-circle">🧠</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Logic Master</h4>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Common</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Boolean Truth Tables</div>
+              </div>
+
+              <div class="glass-card badge-card unlocked">
+                <div class="badge-icon-circle">🔥</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">7-Day Streak</h4>
+                <p style="font-size: 0.75rem; color: var(--secondary); font-weight: 600;">Special</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Unbroken Momentum</div>
+              </div>
+
+              <div class="glass-card badge-card locked">
+                <div class="badge-icon-circle">⚡</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Tesla Circuit Guru</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Locked</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Complete Ohm's Lab</div>
+              </div>
+
+              <div class="glass-card badge-card locked">
+                <div class="badge-icon-circle">🌌</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Grandmaster</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Locked</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Reach Top 3 Worldwide</div>
+              </div>
+
+              <div class="glass-card badge-card locked">
+                <div class="badge-icon-circle">🧬</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Bio Architect</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Locked</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Cell Biology Quiz</div>
+              </div>
+
+              <div class="glass-card badge-card locked">
+                <div class="badge-icon-circle">🚀</div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Relativity Speedster</h4>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Locked</p>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">Speed of light simulation</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Global Leaderboard -->
+          <div>
+            <div class="glass-card" style="padding: 1.75rem; position: sticky; top: 90px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-solid fa-ranking-star text-gold"></i> Hall of Fame
+                </h3>
+                <span class="badge badge-primary">Weekly</span>
+              </div>
+
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Top scholars competing across all STEM quest categories.
+              </p>
+
+              <div id="full-leaderboard-list">
+                <!-- Dynamically loaded -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Interactive Quiz Modal -->
+  <div class="modal-overlay" id="quiz-modal">
+    <div class="modal-content" style="max-width: 680px;">
+      
+      <!-- Step 1: Instructions Screen -->
+      <div id="modal-step-intro" style="padding: 2rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(108, 99, 255, 0.2); color: var(--primary-light); font-size: 2.2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <h2 id="modal-quiz-title" style="font-size: 1.75rem; margin-bottom: 0.5rem;">Quiz Title</h2>
+          <p id="modal-quiz-desc" style="color: var(--text-secondary); font-size: 0.95rem;">Quiz instructions overview</p>
+        </div>
+
+        <div class="glass-card" style="padding: 1.25rem; margin-bottom: 2rem; background: rgba(255, 255, 255, 0.03);">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 1rem;">
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Reward</div>
+              <div id="modal-quiz-xp" style="font-weight: 700; color: var(--gold); font-size: 1.1rem;">+200 XP</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Questions</div>
+              <div id="modal-quiz-qcount" style="font-weight: 700; color: #FFFFFF; font-size: 1.1rem;">5 Questions</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Time Limit</div>
+              <div id="modal-quiz-time" style="font-weight: 700; color: var(--accent); font-size: 1.1rem;">5 Mins</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn btn-outline" style="flex: 1;" onclick="closeQuizModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex: 2;" id="start-quiz-btn">
+            <i class="fa-solid fa-play"></i> Start Challenge Now
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Question Active Screen -->
+      <div id="modal-step-question" style="display: none; padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <span class="badge badge-primary" id="quiz-question-counter">Question 1 of 5</span>
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--secondary);" id="quiz-timer-display">
+            <i class="fa-regular fa-clock"></i> <span id="quiz-timer-seconds">05:00</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-container" style="height: 6px; margin-bottom: 1.75rem;">
+          <div id="quiz-progress-bar" class="progress-fill" style="width: 20%;"></div>
+        </div>
+
+        <h3 id="quiz-question-text" style="font-size: 1.25rem; line-height: 1.5; margin-bottom: 1.75rem;">
+          Question prompt will appear here...
+        </h3>
+
+        <!-- Options Container -->
+        <div id="quiz-options-container">
+          <!-- Dynamic Option Buttons -->
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+          <button class="btn btn-outline btn-sm" onclick="closeQuizModal()">Quit Quiz</button>
+          <button class="btn btn-primary" id="quiz-next-btn" disabled>
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Results Celebration Screen -->
+      <div id="modal-step-results" style="display: none; padding: 2.5rem 2rem; text-align: center;">
+        <div style="font-size: 3.5rem; margin-bottom: 1rem;" id="results-emoji">🎉</div>
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;" id="results-headline">Quest Completed!</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;" id="results-subtext">You demonstrated superb algorithm mastery.</p>
+
+        <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem; background: rgba(255, 255, 255, 0.03);">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Score</div>
+              <div id="results-score" style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF;">80%</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">XP Earned</div>
+              <div id="results-xp" style="font-size: 1.85rem; font-weight: 800; color: var(--gold);">+200 XP</div>
+            </div>
+            <div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Accuracy</div>
+              <div id="results-accuracy" style="font-size: 1.85rem; font-weight: 800; color: var(--accent);">4/5 Correct</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="results-badge-unlock-box" style="display: none; margin-bottom: 2rem; padding: 1rem; border-radius: var(--radius-sm); background: rgba(67, 233, 123, 0.12); border: 1px solid rgba(67, 233, 123, 0.3);">
+          <div style="font-weight: 700; color: var(--accent); margin-bottom: 0.25rem;">🏆 New Badge Unlocked!</div>
+          <div id="results-badge-name" style="font-size: 1.1rem; color: #FFFFFF; font-weight: 800;">Algorithm Ace</div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <button class="btn btn-outline" onclick="closeQuizModal()">Back to Quests</button>
+          <button class="btn btn-primary" id="quiz-retry-btn">Try Again</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    // State management for quizzes
+    let allQuizzes = [];
+    let currentQuiz = null;
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let quizTimer = null;
+    let secondsRemaining = 300;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      checkAuth(true);
+      initNavUser();
+
+      await loadQuizzes();
+      await loadLeaderboard();
+      setupCategoryFilters();
+    });
+
+    async function loadQuizzes() {
+      try {
+        allQuizzes = await EduPlayAPI.getQuizList();
+        renderQuizzes(allQuizzes);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderQuizzes(quizzes) {
+      const container = document.getElementById('quizzes-container');
+      const countLabel = document.getElementById('quiz-count-label');
+      if (countLabel) countLabel.textContent = `${quizzes.length} Quests Available`;
+
+      container.innerHTML = quizzes.map(q => {
+        let diffColor = 'var(--accent)';
+        if (q.difficulty === 'Medium') diffColor = 'var(--warning)';
+        if (q.difficulty === 'Hard') diffColor = 'var(--secondary)';
+
+        return `
+          <div class="glass-card quiz-card">
+            <div class="quiz-card-top">
+              <span class="badge" style="background: rgba(255,255,255,0.08); color: ${diffColor}; border: 1px solid ${diffColor};">
+                ${q.difficulty}
+              </span>
+              <span class="badge badge-gold">
+                <i class="fa-solid fa-bolt"></i> +${q.xp_reward} XP
+              </span>
+            </div>
+
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">${q.title}</h3>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; flex: 1;">${q.description}</p>
+
+            <div class="quiz-meta-row">
+              <div class="quiz-meta-item">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>${q.questions.length} Questions</span>
+              </div>
+              <div class="quiz-meta-item">
+                <i class="fa-regular fa-clock"></i>
+                <span>${q.time_limit_mins} mins</span>
+              </div>
+              <div class="quiz-meta-item">
+                <i class="fa-solid fa-medal text-gold"></i>
+                <span>${q.badge_reward}</span>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="openQuizModal(${q.id})" style="width: 100%;">
+              <i class="fa-solid fa-play"></i> Start Challenge
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadLeaderboard() {
+      try {
+        const board = await EduPlayAPI.getLeaderboard();
+        const container = document.getElementById('full-leaderboard-list');
+
+        container.innerHTML = board.map(item => {
+          let rankIcon = `#${item.rank}`;
+          if (item.rank === 1) rankIcon = '🥇';
+          if (item.rank === 2) rankIcon = '🥈';
+          if (item.rank === 3) rankIcon = '🥉';
+
+          const isUser = item.is_current_user || item.username === 'alex_hunter';
+
+          return `
+            <div style="display: flex; align-items: center; gap: 0.85rem; padding: 0.8rem; border-radius: var(--radius-sm); margin-bottom: 0.4rem; background: ${isUser ? 'rgba(108, 99, 255, 0.15)' : 'rgba(255, 255, 255, 0.03)'}; border: 1px solid ${isUser ? 'var(--primary)' : 'transparent'};">
+              <span style="font-weight: 800; width: 24px; text-align: center; font-size: 1.1rem;">${rankIcon}</span>
+              <div class="user-avatar" style="width: 36px; height: 36px; font-size: 0.85rem;">${item.avatar || 'US'}</div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-weight: 600; font-size: 0.88rem; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${item.name} ${isUser ? '<span style="color: var(--accent); font-size: 0.72rem;">(You)</span>' : ''}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">${item.badge}</div>
+              </div>
+              <span style="font-weight: 700; font-size: 0.88rem; color: var(--gold);">${item.xp.toLocaleString()} XP</span>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function setupCategoryFilters() {
+      const chips = document.querySelectorAll('.category-chip');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          const cat = chip.dataset.category;
+
+          if (cat === 'all') {
+            renderQuizzes(allQuizzes);
+          } else {
+            const filtered = allQuizzes.filter(q => q.subject.toLowerCase() === cat.toLowerCase());
+            renderQuizzes(filtered);
+          }
+        });
+      });
+    }
+
+    // ==========================================
+    // Interactive Quiz Engine
+    // ==========================================
+    function openQuizModal(quizId) {
+      currentQuiz = allQuizzes.find(q => q.id === Number(quizId));
+      if (!currentQuiz) return;
+
+      document.getElementById('modal-quiz-title').textContent = currentQuiz.title;
+      document.getElementById('modal-quiz-desc').textContent = currentQuiz.description;
+      document.getElementById('modal-quiz-xp').textContent = `+${currentQuiz.xp_reward} XP`;
+      document.getElementById('modal-quiz-qcount').textContent = `${currentQuiz.questions.length} Questions`;
+      document.getElementById('modal-quiz-time').textContent = `${currentQuiz.time_limit_mins} Mins`;
+
+      document.getElementById('modal-step-intro').style.display = 'block';
+      document.getElementById('modal-step-question').style.display = 'none';
+      document.getElementById('modal-step-results').style.display = 'none';
+
+      document.getElementById('quiz-modal').classList.add('active');
+
+      document.getElementById('start-quiz-btn').onclick = startQuizSession;
+    }
+
+    function closeQuizModal() {
+      if (quizTimer) clearInterval(quizTimer);
+      document.getElementById('quiz-modal').classList.remove('active');
+    }
+
+    function startQuizSession() {
+      currentQuestionIndex = 0;
+      userAnswers = new Array(currentQuiz.questions.length).fill(null);
+      secondsRemaining = currentQuiz.time_limit_mins * 60;
+
+      document.getElementById('modal-step-intro').style.display = 'none';
+      document.getElementById('modal-step-question').style.display = 'block';
+
+      renderCurrentQuestion();
+      startTimer();
+    }
+
+    function startTimer() {
+      if (quizTimer) clearInterval(quizTimer);
+      const display = document.getElementById('quiz-timer-seconds');
+
+      quizTimer = setInterval(() => {
+        secondsRemaining--;
+        const m = Math.floor(secondsRemaining / 60).toString().padStart(2, '0');
+        const s = (secondsRemaining % 60).toString().padStart(2, '0');
+        display.textContent = `${m}:${s}`;
+
+        if (secondsRemaining <= 0) {
+          clearInterval(quizTimer);
+          finishQuiz();
+        }
+      }, 1000);
+    }
+
+    function renderCurrentQuestion() {
+      const q = currentQuiz.questions[currentQuestionIndex];
+      const totalQ = currentQuiz.questions.length;
+
+      document.getElementById('quiz-question-counter').textContent = `Question ${currentQuestionIndex + 1} of ${totalQ}`;
+      document.getElementById('quiz-progress-bar').style.width = `${((currentQuestionIndex + 1) / totalQ) * 100}%`;
+      document.getElementById('quiz-question-text').textContent = q.text;
+
+      const optionsBox = document.getElementById('quiz-options-container');
+      const nextBtn = document.getElementById('quiz-next-btn');
+      nextBtn.disabled = userAnswers[currentQuestionIndex] === null;
+
+      if (currentQuestionIndex === totalQ - 1) {
+        nextBtn.innerHTML = `Finish Quiz <i class="fa-solid fa-flag-checkered"></i>`;
+      } else {
+        nextBtn.innerHTML = `Next Question <i class="fa-solid fa-arrow-right"></i>`;
+      }
+
+      const keys = ['A', 'B', 'C', 'D'];
+      optionsBox.innerHTML = q.options.map((opt, idx) => `
+        <button class="quiz-option-btn ${userAnswers[currentQuestionIndex] === idx ? 'selected' : ''}" onclick="selectOption(${idx})">
+          <span class="quiz-option-key">${keys[idx]}</span>
+          <span>${opt}</span>
+        </button>
+      `).join('');
+
+      nextBtn.onclick = () => {
+        if (currentQuestionIndex < totalQ - 1) {
+          currentQuestionIndex++;
+          renderCurrentQuestion();
+        } else {
+          finishQuiz();
+        }
+      };
+    }
+
+    function selectOption(optionIndex) {
+      userAnswers[currentQuestionIndex] = optionIndex;
+      document.querySelectorAll('.quiz-option-btn').forEach((btn, idx) => {
+        btn.classList.toggle('selected', idx === optionIndex);
+      });
+      document.getElementById('quiz-next-btn').disabled = false;
+    }
+
+    async function finishQuiz() {
+      if (quizTimer) clearInterval(quizTimer);
+
+      document.getElementById('modal-step-question').style.display = 'none';
+      document.getElementById('modal-step-results').style.display = 'block';
+
+      // Submit answers via API client (or demo fallback)
+      const res = await EduPlayAPI.submitQuiz(currentQuiz.id, userAnswers);
+
+      document.getElementById('results-score').textContent = `${res.score_percentage}%`;
+      document.getElementById('results-xp').textContent = `+${res.xp_earned} XP`;
+      document.getElementById('results-accuracy').textContent = `${res.correct_answers}/${res.total_questions} Correct`;
+
+      const badgeBox = document.getElementById('results-badge-unlock-box');
+      if (res.badge_unlocked) {
+        badgeBox.style.display = 'block';
+        document.getElementById('results-badge-name').textContent = res.badge_unlocked;
+      } else {
+        badgeBox.style.display = 'none';
+      }
+
+      if (res.score_percentage >= 75) {
+        document.getElementById('results-emoji').textContent = '🏆';
+        document.getElementById('results-headline').textContent = 'Magnificent Performance!';
+        document.getElementById('results-subtext').textContent = 'You have mastered this quest with distinction.';
+      } else {
+        document.getElementById('results-emoji').textContent = '💡';
+        document.getElementById('results-headline').textContent = 'Great Effort!';
+        document.getElementById('results-subtext').textContent = 'Review the solutions and conquer this quiz on your next attempt.';
+      }
+
+      document.getElementById('quiz-retry-btn').onclick = () => {
+        startQuizSession();
+      };
+
+      // Refresh topbar user info (XP increased)
+      initNavUser();
+    }
+  </script>
+</body>
+</html>

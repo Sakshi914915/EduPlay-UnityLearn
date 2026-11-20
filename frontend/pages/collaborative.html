@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaborative Guilds & Forums | EduPlay - UnityLearn</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="../css/main.css">
+
+  <style>
+    .collab-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 2rem;
+    }
+
+    /* Study Guilds Horizontal Carousel/Grid */
+    .guilds-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .guild-card {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-md);
+      position: relative;
+    }
+
+    /* Forum Posts List */
+    .post-card {
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .post-card:hover {
+      border-color: var(--primary-light);
+    }
+
+    .post-author-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .post-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .post-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      user-select: none;
+    }
+
+    .post-action-btn:hover {
+      color: #FFFFFF;
+    }
+
+    .post-action-btn.liked {
+      color: var(--secondary);
+    }
+
+    .post-action-btn.liked i {
+      animation: pulse 0.4s ease;
+    }
+
+    /* Peer Review Exchange List */
+    .peer-review-item {
+      padding: 1.2rem;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 1100px) {
+      .collab-grid {
+        grid-template-columns: 1fr;
+      }
+      .guilds-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .guilds-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Unified Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-brand">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay</span>
+        </a>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="sidebar-heading">Navigation</div>
+        
+        <a href="../dashboard.html" class="nav-link-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="game-learning.html" class="nav-link-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Game Learning</span>
+          <span class="nav-pill">XP</span>
+        </a>
+
+        <a href="simulations.html" class="nav-link-item">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Simulations</span>
+          <span class="nav-pill" style="background: rgba(67, 233, 123, 0.18); color: var(--accent);">Labs</span>
+        </a>
+
+        <a href="learning-paths.html" class="nav-link-item">
+          <i class="fa-solid fa-route"></i>
+          <span>Learning Paths</span>
+        </a>
+
+        <a href="collaborative.html" class="nav-link-item active">
+          <i class="fa-solid fa-users"></i>
+          <span>Collaborative</span>
+        </a>
+
+        <a href="analytics.html" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+
+        <a href="authoring.html" class="nav-link-item">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>Authoring</span>
+        </a>
+
+        <div class="sidebar-heading" style="margin-top: 1rem;">System</div>
+        <a href="#" onclick="logout(); return false;" class="nav-link-item" style="color: var(--secondary);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar user-avatar-initials">AH</div>
+          <div class="user-details">
+            <div class="user-name user-name-display">Alex Hunter</div>
+            <div class="user-role user-level-display">Level 12 Scholar</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      
+      <!-- Top Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="forum-search-input" placeholder="Search discussion topics or guilds...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="gamification-pill pill-streak user-streak-badge">
+            <i class="fa-solid fa-fire text-secondary"></i> <span>7 Days</span>
+          </div>
+
+          <div class="gamification-pill pill-xp user-xp-badge">
+            <i class="fa-solid fa-bolt text-gold"></i> <span>2,450 XP</span>
+          </div>
+
+          <div class="user-avatar user-avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem; cursor: pointer;">AH</div>
+        </div>
+      </header>
+
+      <!-- Main Body -->
+      <main class="page-container">
+        
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">
+              <i class="fa-solid fa-users text-info"></i>
+              <span>Collaborative Learning & Guilds</span>
+            </h1>
+            <p class="page-subtitle">Learn with peers, solve tricky bottlenecks, and conduct structured peer code reviews.</p>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-outline btn-sm" onclick="openCreateGroupModal()">
+              <i class="fa-solid fa-user-plus"></i> Create Guild
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openNewPostModal()">
+              <i class="fa-solid fa-pen-to-square"></i> New Discussion
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 1: Study Guilds / Circles -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.35rem;">Active Study Guilds</h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Voice & Text Rooms</span>
+        </div>
+
+        <div class="guilds-grid" id="guilds-container">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Section 2: Discussions and Peer Review Split -->
+        <div class="collab-grid">
+          
+          <!-- Left: Forum Feed -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h2 style="font-size: 1.35rem;">Community Forum Discussions</h2>
+              <div style="display: flex; gap: 0.5rem;" id="forum-filter-chips">
+                <span class="tag tag-interactive active" data-cat="all">All</span>
+                <span class="tag tag-interactive" data-cat="Programming">Programming</span>
+                <span class="tag tag-interactive" data-cat="Science">Science</span>
+                <span class="tag tag-interactive" data-cat="Study Groups">Study Groups</span>
+              </div>
+            </div>
+
+            <div id="posts-container">
+              <!-- Dynamically populated forum posts -->
+            </div>
+          </div>
+
+          <!-- Right Sidebar: Pinned Announcements & Peer Reviews -->
+          <div>
+            
+            <!-- Pinned Announcements -->
+            <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-thumbtack text-secondary"></i>
+                <h3 style="font-size: 1.1rem;">Official Announcements</h3>
+              </div>
+
+              <div style="padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 1rem;">
+                <span class="badge badge-secondary" style="font-size: 0.7rem; margin-bottom: 0.4rem;">UPCOMING HACKATHON</span>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Global Algorithmic Sprint 2024</h4>
+                <p style="font-size: 0.8rem; color: var(--text-secondary);">Starts this Saturday at 14:00 UTC. +1000 XP prize pool for top 3 teams!</p>
+              </div>
+
+              <div>
+                <span class="badge badge-accent" style="font-size: 0.7rem; margin-bottom: 0.4rem;">LIVE OFFICE HOURS</span>
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">Dr. Marcus Vance (Systems Q&A)</h4>
+                <p style="font-size: 0.8rem; color: var(--text-secondary);">Live in Audio Channel #Alpha right now answering architecture questions.</p>
+              </div>
+            </div>
+
+            <!-- Peer Review Queue -->
+            <div class="glass-card" style="padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-solid fa-clipboard-check text-accent"></i> Peer Review Queue
+                </h3>
+                <span class="badge badge-primary">+50 XP</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                Review student submissions to earn XP and strengthen your understanding.
+              </p>
+
+              <div class="peer-review-item">
+                <div style="font-weight: 600; font-size: 0.88rem; margin-bottom: 0.25rem;">AVL Tree Self-Balancing Code</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">Submitted by Elena Rostova • 3h ago</div>
+                <button class="btn btn-outline btn-sm" style="width: 100%;" onclick="openReviewModal('AVL Tree Balancing', 'Elena Rostova')">
+                  Conduct Review
+                </button>
+              </div>
+
+              <div class="peer-review-item">
+                <div style="font-weight: 600; font-size: 0.88rem; margin-bottom: 0.25rem;">Newton Simulation Lab Report</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">Submitted by Kai Takahashi • Yesterday</div>
+                <button class="btn btn-outline btn-sm" style="width: 100%;" onclick="openReviewModal('Newton Lab Report', 'Kai Takahashi')">
+                  Conduct Review
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Modal 1: New Discussion Post -->
+  <div class="modal-overlay" id="new-post-modal">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Create New Discussion Topic</h3>
+        <button class="modal-close" onclick="closeModal('new-post-modal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="new-post-form">
+          <div class="form-group">
+            <label class="form-label" for="post-title">Discussion Title</label>
+            <input type="text" id="post-title" class="form-input" placeholder="e.g. How does cache invalidation work in WebSockets?" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="post-category">Category</label>
+            <select id="post-category" class="form-select">
+              <option value="Programming">Programming & Algorithms</option>
+              <option value="Science">Science & Physics</option>
+              <option value="Study Groups">Study Groups & Guilds</option>
+              <option value="General">General Inquiries</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="post-content">Detailed Question or Insight</label>
+            <textarea id="post-content" class="form-textarea" placeholder="Explain your thinking or provide code snippets..." rows="6" required></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('new-post-modal')">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Publish Post</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Post Detail & Comments Thread -->
+  <div class="modal-overlay" id="post-detail-modal">
+    <div class="modal-content" style="max-width: 720px;">
+      <div class="modal-header">
+        <div>
+          <span class="badge badge-primary" id="detail-post-category" style="margin-bottom: 0.35rem;">Category</span>
+          <h3 class="modal-title" id="detail-post-title">Post Title</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('post-detail-modal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="post-author-row" style="margin-bottom: 1.25rem;">
+          <div class="user-avatar" id="detail-post-avatar" style="width: 36px; height: 36px; font-size: 0.85rem;">KT</div>
+          <div>
+            <div style="font-weight: 600; font-size: 0.9rem;" id="detail-post-author">Author Name</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);" id="detail-post-time">2 hours ago</div>
+          </div>
+        </div>
+
+        <p id="detail-post-content" style="color: var(--text-primary); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem;">
+          Full post body...
+        </p>
+
+        <h4 style="font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-regular fa-comments"></i> <span>Responses & Insights</span>
+        </h4>
+
+        <!-- Comments Container -->
+        <div id="detail-comments-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+          <!-- Dynamically populated comments -->
+        </div>
+
+        <!-- Add Comment Form -->
+        <div class="glass-card" style="padding: 1.25rem; background: rgba(255, 255, 255, 0.02);">
+          <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.6rem;">Leave a constructive reply</div>
+          <div style="display: flex; gap: 0.75rem;">
+            <input type="text" id="comment-input-field" class="form-input" placeholder="Share your insight or ask a follow-up...">
+            <button class="btn btn-primary btn-sm" id="comment-submit-btn">
+              <i class="fa-solid fa-reply"></i> Reply
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Create Study Guild -->
+  <div class="modal-overlay" id="create-group-modal">
+    <div class="modal-content" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Form a New Study Guild</h3>
+        <button class="modal-close" onclick="closeModal('create-group-modal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="create-group-form">
+          <div class="form-group">
+            <label class="form-label">Guild Name</label>
+            <input type="text" id="group-name" class="form-input" placeholder="e.g. Distributed Systems Syndicate" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Primary Subject</label>
+            <select id="group-subject" class="form-select">
+              <option value="Computer Science">Computer Science & Coding</option>
+              <option value="Physics">Physics & Astronomy</option>
+              <option value="Mathematics">Pure Mathematics</option>
+              <option value="Artificial Intelligence">Machine Learning</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Max Members</label>
+            <input type="number" id="group-max" class="form-input" value="40" min="5" max="100">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Guild Mission / Description</label>
+            <textarea id="group-desc" class="form-textarea" placeholder="Describe the focus and meeting times..."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('create-group-modal')">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-shield-halved"></i> Inaugurate Guild</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Peer Review Evaluation -->
+  <div class="modal-overlay" id="peer-review-modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="review-modal-title">Evaluate Peer Submission</h3>
+        <button class="modal-close" onclick="closeModal('peer-review-modal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.85rem; color: var(--text-muted);">Author: <span id="review-author-name" style="color: #FFFFFF; font-weight: 600;">Elena</span></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Rubric Score (1 to 5 Stars)</label>
+          <div style="display: flex; gap: 0.5rem; font-size: 1.5rem; color: var(--gold); cursor: pointer;" id="star-rating-box">
+            <i class="fa-solid fa-star star" data-val="1"></i>
+            <i class="fa-solid fa-star star" data-val="2"></i>
+            <i class="fa-solid fa-star star" data-val="3"></i>
+            <i class="fa-solid fa-star star" data-val="4"></i>
+            <i class="fa-solid fa-star star" data-val="5"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Constructive Feedback & Suggestions</label>
+          <textarea id="review-feedback-text" class="form-textarea" rows="4" placeholder="Detail what was done exceptionally and what can be optimized..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('peer-review-modal')">Cancel</button>
+          <button type="button" class="btn btn-accent" onclick="submitReviewFeedback()"><i class="fa-solid fa-check"></i> Submit Review (+50 XP)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    let forumPosts = [];
+    let studyGroups = [];
+    let currentDetailPost = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      checkAuth(true);
+      initNavUser();
+
+      await loadStudyGroups();
+      await loadForumPosts();
+      setupForumFilters();
+      setupModals();
+    });
+
+    async function loadStudyGroups() {
+      try {
+        studyGroups = await EduPlayAPI.getStudyGroups();
+        renderStudyGroups();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderStudyGroups() {
+      const container = document.getElementById('guilds-container');
+      container.innerHTML = studyGroups.map(g => `
+        <div class="glass-card guild-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span class="badge badge-primary">${g.subject}</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-users"></i> ${g.members}/${g.max_members}</span>
+          </div>
+
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">${g.name}</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem; flex: 1;">
+            ${g.description}
+          </p>
+
+          <button class="btn ${g.is_joined ? 'btn-outline' : 'btn-accent'} btn-sm" onclick="toggleJoinGuild(${g.id})">
+            ${g.is_joined ? '<i class="fa-solid fa-check"></i> Joined (Leave)' : '<i class="fa-solid fa-plus"></i> Join Guild'}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    async function toggleJoinGuild(id) {
+      const res = await EduPlayAPI.joinGroup(id);
+      showToast(res.is_joined ? 'Joined Guild! Chat access unlocked.' : 'Left Guild.', res.is_joined ? 'success' : 'info');
+      renderStudyGroups();
+    }
+
+    async function loadForumPosts(category = 'all') {
+      try {
+        forumPosts = await EduPlayAPI.getForumPosts(category);
+        renderForumPosts();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderForumPosts() {
+      const container = document.getElementById('posts-container');
+      container.innerHTML = forumPosts.map(p => `
+        <div class="glass-card post-card" onclick="openPostDetail(${p.id})">
+          <div class="post-author-row">
+            <div class="user-avatar" style="width: 38px; height: 38px; font-size: 0.85rem;">${p.author_avatar}</div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.9rem; color: #FFFFFF;">
+                ${p.author} <span class="badge badge-primary" style="font-size: 0.65rem; margin-left: 0.35rem;">${p.author_badge}</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${p.created_at} • in ${p.category}</div>
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; line-height: 1.4;">${p.title}</h3>
+          <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6;">
+            ${p.content.substring(0, 160)}...
+          </p>
+
+          <div class="post-actions-bar" onclick="event.stopPropagation()">
+            <div class="post-action-btn ${p.is_liked ? 'liked' : ''}" onclick="toggleLikePost(${p.id}, this)">
+              <i class="fa-${p.is_liked ? 'solid' : 'regular'} fa-heart"></i>
+              <span>${p.likes} Likes</span>
+            </div>
+            <div class="post-action-btn" onclick="openPostDetail(${p.id})">
+              <i class="fa-regular fa-comment"></i>
+              <span>${p.replies_count} Replies</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function toggleLikePost(postId, btn) {
+      const res = await EduPlayAPI.likePost(postId);
+      const post = forumPosts.find(p => p.id === postId);
+      if (post) {
+        post.likes = res.likes;
+        post.is_liked = res.is_liked;
+      }
+      renderForumPosts();
+    }
+
+    function openPostDetail(postId) {
+      currentDetailPost = forumPosts.find(p => p.id === Number(postId));
+      if (!currentDetailPost) return;
+
+      document.getElementById('detail-post-title').textContent = currentDetailPost.title;
+      document.getElementById('detail-post-category').textContent = currentDetailPost.category;
+      document.getElementById('detail-post-avatar').textContent = currentDetailPost.author_avatar;
+      document.getElementById('detail-post-author').textContent = currentDetailPost.author;
+      document.getElementById('detail-post-time').textContent = currentDetailPost.created_at;
+      document.getElementById('detail-post-content').textContent = currentDetailPost.content;
+
+      renderComments();
+      openModal('post-detail-modal');
+
+      const replyBtn = document.getElementById('comment-submit-btn');
+      replyBtn.onclick = handleAddComment;
+    }
+
+    function renderComments() {
+      const container = document.getElementById('detail-comments-container');
+      if (!currentDetailPost.comments || currentDetailPost.comments.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem;">No replies yet. Be the first to share your thoughts!</div>';
+        return;
+      }
+
+      container.innerHTML = currentDetailPost.comments.map(c => `
+        <div style="display: flex; gap: 0.85rem; padding: 0.85rem 1rem; border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);">
+          <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.75rem;">${c.author_avatar}</div>
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span style="font-weight: 600; font-size: 0.85rem; color: #FFFFFF;">${c.author}</span>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">${c.created_at}</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${c.text}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function handleAddComment() {
+      const input = document.getElementById('comment-input-field');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const newComment = await EduPlayAPI.addComment(currentDetailPost.id, text);
+      input.value = '';
+      renderComments();
+      renderForumPosts();
+      showToast('Reply posted!', 'success');
+    }
+
+    function setupForumFilters() {
+      const chips = document.querySelectorAll('#forum-filter-chips .tag');
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          const cat = chip.dataset.cat;
+          loadForumPosts(cat);
+        });
+      });
+
+      const searchInput = document.getElementById('forum-search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const q = e.target.value.toLowerCase();
+          const filtered = forumPosts.filter(p => p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q));
+          const container = document.getElementById('posts-container');
+          container.innerHTML = filtered.map(p => `
+            <div class="glass-card post-card" onclick="openPostDetail(${p.id})">
+              <h3>${p.title}</h3>
+              <p>${p.content.substring(0, 140)}...</p>
+            </div>
+          `).join('');
+        });
+      }
+    }
+
+    // Modal Control Helpers
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function openNewPostModal() {
+      openModal('new-post-modal');
+    }
+
+    function openCreateGroupModal() {
+      openModal('create-group-modal');
+    }
+
+    function setupModals() {
+      // New post submit
+      document.getElementById('new-post-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('post-title').value;
+        const category = document.getElementById('post-category').value;
+        const content = document.getElementById('post-content').value;
+
+        await EduPlayAPI.createPost({ title, category, content });
+        closeModal('new-post-modal');
+        showToast('Discussion published to community!', 'success');
+        renderForumPosts();
+      });
+
+      // Create group submit
+      document.getElementById('create-group-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('group-name').value;
+        const subject = document.getElementById('group-subject').value;
+        const max = parseInt(document.getElementById('group-max').value);
+        const desc = document.getElementById('group-desc').value;
+
+        studyGroups.unshift({
+          id: Date.now(),
+          name,
+          subject,
+          members: 1,
+          max_members: max,
+          is_joined: true,
+          description: desc
+        });
+
+        closeModal('create-group-modal');
+        showToast(`Guild "${name}" successfully formed!`, 'success');
+        renderStudyGroups();
+      });
+    }
+
+    // Peer Review Modal
+    function openReviewModal(taskName, author) {
+      document.getElementById('review-modal-title').textContent = `Review: ${taskName}`;
+      document.getElementById('review-author-name').textContent = author;
+      openModal('peer-review-modal');
+    }
+
+    function submitReviewFeedback() {
+      closeModal('peer-review-modal');
+      showToast('Feedback submitted! You earned +50 XP ⚡', 'success');
+      const user = getUserData();
+      user.xp = (user.xp || 2450) + 50;
+      setUserData(user);
+    }
+  </script>
+</body>
+</html>

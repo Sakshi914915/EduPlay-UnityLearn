@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | EduPlay - UnityLearn</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="css/main.css">
+
+  <style>
+    /* Dashboard-specific layout enhancements */
+    .dashboard-hero-card {
+      padding: 2.25rem;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 85% 20%, rgba(108, 99, 255, 0.25) 0%, rgba(23, 23, 40, 0.8) 100%), var(--bg-card);
+      border: 1px solid var(--border-glow);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+      position: relative;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.25rem;
+    }
+
+    .kpi-card {
+      padding: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      border-radius: var(--radius-md);
+    }
+
+    .kpi-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.1;
+    }
+
+    .kpi-label {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
+    }
+
+    /* Quick Module Actions Grid */
+    .quick-modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .quick-module-card {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .quick-module-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .quick-module-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .quick-module-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    /* Two Column Split: Activities & Leaderboard */
+    .dashboard-columns {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+    }
+
+    /* Notification Dropdown */
+    .notif-popup {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      width: 320px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 1.25rem;
+      display: none;
+      z-index: 1000;
+    }
+
+    @media (max-width: 1200px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .quick-modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .dashboard-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .quick-modules-grid {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-hero-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Unified Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="nav-brand">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay</span>
+        </a>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="sidebar-heading">Navigation</div>
+        
+        <a href="dashboard.html" class="nav-link-item active">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="pages/game-learning.html" class="nav-link-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Game Learning</span>
+          <span class="nav-pill">XP</span>
+        </a>
+
+        <a href="pages/simulations.html" class="nav-link-item">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Simulations</span>
+          <span class="nav-pill" style="background: rgba(67, 233, 123, 0.18); color: var(--accent);">Labs</span>
+        </a>
+
+        <a href="pages/learning-paths.html" class="nav-link-item">
+          <i class="fa-solid fa-route"></i>
+          <span>Learning Paths</span>
+        </a>
+
+        <a href="pages/collaborative.html" class="nav-link-item">
+          <i class="fa-solid fa-users"></i>
+          <span>Collaborative</span>
+        </a>
+
+        <a href="pages/analytics.html" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+
+        <a href="pages/authoring.html" class="nav-link-item">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>Authoring</span>
+        </a>
+
+        <div class="sidebar-heading" style="margin-top: 1rem;">System</div>
+        <a href="#" onclick="logout(); return false;" class="nav-link-item" style="color: var(--secondary);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar user-avatar-initials">AH</div>
+          <div class="user-details">
+            <div class="user-name user-name-display">Alex Hunter</div>
+            <div class="user-role user-level-display">Level 12 Scholar</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      
+      <!-- Top Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="dashboard-search-input" placeholder="Search modules, quizzes, labs...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Streak Pill -->
+          <div class="gamification-pill pill-streak user-streak-badge">
+            <i class="fa-solid fa-fire text-secondary"></i> <span>7 Days</span>
+          </div>
+
+          <!-- XP Pill -->
+          <div class="gamification-pill pill-xp user-xp-badge">
+            <i class="fa-solid fa-bolt text-gold"></i> <span>2,450 XP</span>
+          </div>
+
+          <!-- Notifications Bell -->
+          <div style="position: relative;">
+            <button class="icon-btn" id="notif-bell-btn" title="Notifications">
+              <i class="fa-regular fa-bell"></i>
+              <span class="badge-dot"></span>
+            </button>
+
+            <!-- Dropdown Popup -->
+            <div id="notif-dropdown-popup" class="notif-popup">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.85rem; font-weight: 700; font-size: 0.9rem;">
+                <span>Notifications</span>
+                <span style="color: var(--primary-light); font-size: 0.75rem; cursor: pointer;">Mark all read</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;">
+                  <span style="color: var(--accent);">🏆 Achievement unlocked!</span>
+                  <div style="color: var(--text-secondary); font-size: 0.75rem;">You earned the 'Algorithm Ace' badge!</div>
+                </div>
+                <div style="padding: 0.5rem 0; font-size: 0.85rem;">
+                  <span style="color: var(--primary-light);">👥 Study Guild invite</span>
+                  <div style="color: var(--text-secondary); font-size: 0.75rem;">Elena invited you to Python Algorithms.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Profile Avatar Pill -->
+          <div class="user-avatar user-avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem; cursor: pointer;">AH</div>
+        </div>
+      </header>
+
+      <!-- Dashboard Body -->
+      <main class="page-container">
+        
+        <!-- Welcome Hero Banner -->
+        <div class="glass-card dashboard-hero-card">
+          <div style="max-width: 600px;">
+            <div class="badge badge-primary" style="margin-bottom: 0.75rem;" id="hero-level-badge">Level 12 Scholar</div>
+            <h1 style="font-size: 2.2rem; margin-bottom: 0.6rem;">
+              Welcome back, <span class="gradient-text" id="welcome-user-name">Alex</span>! 🎉
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">
+              You're only <strong style="color: #FFFFFF;">550 XP</strong> away from Level 13: Quantum Master. 
+              Keep your 7-day streak blazing by completing today's challenge!
+            </p>
+
+            <!-- XP Progress to next level -->
+            <div style="max-width: 480px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.825rem; font-weight: 600; margin-bottom: 0.4rem;">
+                <span id="xp-current-display">2,450 XP</span>
+                <span style="color: var(--text-muted);" id="xp-target-display">3,000 XP Target</span>
+              </div>
+              <div class="progress-bar-container progress-bar-lg">
+                <div id="hero-xp-bar" class="progress-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <a href="pages/game-learning.html" class="btn btn-primary">
+              <i class="fa-solid fa-play"></i> Daily Quiz Challenge
+            </a>
+            <a href="pages/simulations.html" class="btn btn-outline">
+              <i class="fa-solid fa-flask"></i> Launch Physics Lab
+            </a>
+          </div>
+        </div>
+
+        <!-- 4 KPI Metrics Row -->
+        <section class="kpi-grid">
+          <div class="glass-card kpi-card">
+            <div class="kpi-icon" style="background: rgba(255, 215, 0, 0.15); color: var(--gold);">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div>
+              <div class="kpi-value" id="stat-total-xp">0</div>
+              <div class="kpi-label">Total Experience Points</div>
+            </div>
+          </div>
+
+          <div class="glass-card kpi-card">
+            <div class="kpi-icon" style="background: rgba(108, 99, 255, 0.15); color: #8E87FF;">
+              <i class="fa-solid fa-book-bookmark"></i>
+            </div>
+            <div>
+              <div class="kpi-value" id="stat-courses">0</div>
+              <div class="kpi-label">Courses In Progress</div>
+            </div>
+          </div>
+
+          <div class="glass-card kpi-card">
+            <div class="kpi-icon" style="background: rgba(67, 233, 123, 0.15); color: var(--accent);">
+              <i class="fa-solid fa-medal"></i>
+            </div>
+            <div>
+              <div class="kpi-value" id="stat-badges">0</div>
+              <div class="kpi-label">Badges Unlocked</div>
+            </div>
+          </div>
+
+          <div class="glass-card kpi-card">
+            <div class="kpi-icon" style="background: rgba(255, 101, 132, 0.15); color: var(--secondary);">
+              <i class="fa-solid fa-fire"></i>
+            </div>
+            <div>
+              <div class="kpi-value" id="stat-streak">0</div>
+              <div class="kpi-label">Day Streak Multplier</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Six Module Quick Launch Cards -->
+        <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 1.45rem;">Learning Modules</h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">6 Interactive Domains</span>
+        </div>
+
+        <section class="quick-modules-grid">
+          <!-- Card 1 -->
+          <a href="pages/game-learning.html" class="glass-card quick-module-card">
+            <div class="quick-module-top">
+              <div class="quick-module-icon" style="background: rgba(108, 99, 255, 0.15); color: #8E87FF;">
+                <i class="fa-solid fa-gamepad"></i>
+              </div>
+              <span class="badge badge-primary">Module 1</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem;">Game-Based Learning</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+              Timed quizzes, achievement badges, and live competitive leaderboards.
+            </p>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--primary-light); font-weight: 600;">
+              <span>Take Quiz</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Card 2 -->
+          <a href="pages/simulations.html" class="glass-card quick-module-card">
+            <div class="quick-module-top">
+              <div class="quick-module-icon" style="background: rgba(67, 233, 123, 0.15); color: var(--accent);">
+                <i class="fa-solid fa-flask-vial"></i>
+              </div>
+              <span class="badge badge-accent">Module 2</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem;">Interactive Simulations</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+              Physics motion, Ohm's law circuits, biology cells, and math graphs.
+            </p>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--accent); font-weight: 600;">
+              <span>Open Labs</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Card 3 -->
+          <a href="pages/learning-paths.html" class="glass-card quick-module-card">
+            <div class="quick-module-top">
+              <div class="quick-module-icon" style="background: rgba(255, 101, 132, 0.15); color: var(--secondary);">
+                <i class="fa-solid fa-compass"></i>
+              </div>
+              <span class="badge badge-secondary">Module 3</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem;">Adaptive Learning Paths</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+              Personalized roadmap step trees calibrated to your learning pace.
+            </p>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--secondary); font-weight: 600;">
+              <span>View Roadmaps</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Card 4 -->
+          <a href="pages/collaborative.html" class="glass-card quick-module-card">
+            <div class="quick-module-top">
+              <div class="quick-module-icon" style="background: rgba(56, 182, 255, 0.15); color: #38B6FF;">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <span class="badge" style="background: rgba(56, 182, 255, 0.15); color: #38B6FF;">Module 4</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem;">Collaborative Guilds</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+              Join peer study groups, question forums, and submit peer code reviews.
+            </p>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: #38B6FF; font-weight: 600;">
+              <span>Community</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Card 5 -->
+          <a href="pages/analytics.html" class="glass-card quick-module-card">
+            <div class="quick-module-top">
+              <div class="quick-module-icon" style="background: rgba(255, 215, 0, 0.15); color: var(--gold);">
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+              <span class="badge badge-gold">Module 5</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem;">Performance Telemetry</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+              90-day study heatmaps, accuracy radar, and downloadable reports.
+            </p>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--gold); font-weight: 600;">
+              <span>View Insights</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+
+          <!-- Card 6 -->
+          <a href="pages/authoring.html" class="glass-card quick-module-card">
+            <div class="quick-module-top">
+              <div class="quick-module-icon" style="background: rgba(255, 160, 122, 0.15); color: var(--warning);">
+                <i class="fa-solid fa-pen-ruler"></i>
+              </div>
+              <span class="badge badge-warning">Module 6</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem;">Content Authoring</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+              Interactive quiz builder, course drafts, and media asset manager.
+            </p>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--warning); font-weight: 600;">
+              <span>Build Challenges</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </a>
+        </section>
+
+        <!-- Two Column Section: Recent Activity & Mini Leaderboard -->
+        <section class="dashboard-columns">
+          <!-- Recent Activity -->
+          <div class="glass-card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.2rem;">Recent Activity Feed</h3>
+              <a href="pages/analytics.html" style="font-size: 0.825rem; color: var(--primary-light); font-weight: 600;">All History</a>
+            </div>
+            <div id="activity-feed-container">
+              <!-- Dynamically populated -->
+              <div style="text-align: center; padding: 2rem;"><span class="spinner"></span></div>
+            </div>
+          </div>
+
+          <!-- Mini Leaderboard -->
+          <div class="glass-card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.2rem;">Top Scholars</h3>
+              <a href="pages/game-learning.html" style="font-size: 0.825rem; color: var(--primary-light); font-weight: 600;">Full Board</a>
+            </div>
+            <div id="mini-leaderboard-container">
+              <!-- Dynamically populated -->
+              <div style="text-align: center; padding: 2rem;"><span class="spinner"></span></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

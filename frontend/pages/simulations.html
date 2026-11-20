@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Simulations | EduPlay - UnityLearn</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="../css/main.css">
+
+  <style>
+    .sim-category-nav {
+      display: flex;
+      gap: 0.65rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .sim-chip {
+      padding: 0.55rem 1.25rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .sim-chip:hover, .sim-chip.active {
+      background: var(--accent);
+      color: #0F0F1A;
+      border-color: var(--accent-light);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Simulation Showcase Area */
+    .featured-sim-card {
+      padding: 2.25rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 3rem;
+      border: 1px solid rgba(67, 233, 123, 0.3);
+      background: radial-gradient(circle at 90% 10%, rgba(67, 233, 123, 0.15) 0%, rgba(23, 23, 40, 0.8) 100%), var(--bg-card);
+    }
+
+    .sim-canvas-box {
+      width: 100%;
+      height: 220px;
+      background: rgba(10, 10, 18, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Newton Track and Ball */
+    .newton-track {
+      position: absolute;
+      bottom: 40px;
+      left: 20px;
+      right: 20px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .newton-ball {
+      position: absolute;
+      bottom: 44px;
+      left: 30px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #72F29D, #38C768);
+      box-shadow: 0 0 20px var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0F0F1A;
+      font-weight: 800;
+      font-size: 0.8rem;
+      transition: left 0.05s linear;
+    }
+
+    .sim-controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      gap: 1.5rem;
+      align-items: flex-end;
+    }
+
+    .sim-telemetry-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .telemetry-item {
+      padding: 0.9rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    /* Circuit Simulation Styles */
+    .circuit-board {
+      width: 100%;
+      height: 190px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md);
+      position: relative;
+      background: rgba(10, 10, 20, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .circuit-wire {
+      position: absolute;
+      border: 3px solid #6C63FF;
+      border-radius: 8px;
+      width: 75%;
+      height: 110px;
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .circuit-bulb {
+      position: absolute;
+      top: -24px;
+      left: calc(50% - 24px);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #FFE600;
+      box-shadow: 0 0 35px #FFE600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0F0F1A;
+      font-size: 1.4rem;
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+
+    .circuit-battery {
+      position: absolute;
+      bottom: -18px;
+      left: calc(50% - 40px);
+      width: 80px;
+      height: 36px;
+      background: #1F1F35;
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    /* Pendulum Visuals */
+    .pendulum-stage {
+      height: 190px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pendulum-pivot {
+      position: absolute;
+      top: 10px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #FFFFFF;
+    }
+
+    .pendulum-arm {
+      position: absolute;
+      top: 18px;
+      width: 3px;
+      background: rgba(255, 255, 255, 0.4);
+      transform-origin: top center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: height 0.2s ease;
+    }
+
+    .pendulum-bob {
+      position: absolute;
+      bottom: -15px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--secondary), #E0506E);
+      box-shadow: 0 0 18px var(--secondary-glow);
+    }
+
+    /* Biology SVG Cell */
+    .cell-interactive-svg {
+      width: 100%;
+      max-height: 240px;
+      cursor: pointer;
+    }
+
+    .organelle {
+      transition: transform 0.2s ease, filter 0.2s ease;
+      cursor: pointer;
+    }
+
+    .organelle:hover {
+      filter: drop-shadow(0 0 10px var(--accent));
+      transform: scale(1.04);
+    }
+
+    /* Multi Sim Grid */
+    .sims-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    /* Journal Table */
+    .journal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .journal-table th, .journal-table td {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .journal-table th {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .journal-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    @media (max-width: 992px) {
+      .sims-grid {
+        grid-template-columns: 1fr;
+      }
+      .sim-controls-grid {
+        grid-template-columns: 1fr;
+      }
+      .sim-telemetry-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Unified Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-brand">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay</span>
+        </a>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="sidebar-heading">Navigation</div>
+        
+        <a href="../dashboard.html" class="nav-link-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="game-learning.html" class="nav-link-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Game Learning</span>
+          <span class="nav-pill">XP</span>
+        </a>
+
+        <a href="simulations.html" class="nav-link-item active">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Simulations</span>
+          <span class="nav-pill" style="background: rgba(67, 233, 123, 0.18); color: var(--accent);">Labs</span>
+        </a>
+
+        <a href="learning-paths.html" class="nav-link-item">
+          <i class="fa-solid fa-route"></i>
+          <span>Learning Paths</span>
+        </a>
+
+        <a href="collaborative.html" class="nav-link-item">
+          <i class="fa-solid fa-users"></i>
+          <span>Collaborative</span>
+        </a>
+
+        <a href="analytics.html" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+
+        <a href="authoring.html" class="nav-link-item">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>Authoring</span>
+        </a>
+
+        <div class="sidebar-heading" style="margin-top: 1rem;">System</div>
+        <a href="#" onclick="logout(); return false;" class="nav-link-item" style="color: var(--secondary);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar user-avatar-initials">AH</div>
+          <div class="user-details">
+            <div class="user-name user-name-display">Alex Hunter</div>
+            <div class="user-role user-level-display">Level 12 Scholar</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      
+      <!-- Top Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search simulation labs...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="gamification-pill pill-streak user-streak-badge">
+            <i class="fa-solid fa-fire text-secondary"></i> <span>7 Days</span>
+          </div>
+
+          <div class="gamification-pill pill-xp user-xp-badge">
+            <i class="fa-solid fa-bolt text-gold"></i> <span>2,450 XP</span>
+          </div>
+
+          <div class="user-avatar user-avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem; cursor: pointer;">AH</div>
+        </div>
+      </header>
+
+      <!-- Simulations Body -->
+      <main class="page-container">
+        
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">
+              <i class="fa-solid fa-flask-vial text-accent"></i>
+              <span>Interactive Virtual Simulation Labs</span>
+            </h1>
+            <p class="page-subtitle">Experiment freely with physics, circuits, biology, and calculus with zero risk.</p>
+          </div>
+
+          <div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Lab data recorded to Journal!', 'success')">
+              <i class="fa-solid fa-floppy-disk"></i> Save Current Lab
+            </button>
+          </div>
+        </div>
+
+        <!-- Subject Chips -->
+        <div class="sim-category-nav">
+          <div class="sim-chip active">All Disciplines</div>
+          <div class="sim-chip">Classical Physics</div>
+          <div class="sim-chip">Circuit Electronics</div>
+          <div class="sim-chip">Cellular Biology</div>
+          <div class="sim-chip">Calculus & Graphing</div>
+        </div>
+
+        <!-- 1. Featured Simulation: Newton's Laws of Motion -->
+        <section class="glass-card featured-sim-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <span class="badge badge-accent" style="margin-bottom: 0.35rem;">FEATURED PHYSICS LAB</span>
+              <h2 style="font-size: 1.5rem;">Newton's Second Law: Force, Mass & Acceleration</h2>
+            </div>
+            <span class="badge badge-gold"><i class="fa-solid fa-bolt"></i> +150 XP on completion</span>
+          </div>
+
+          <!-- Interactive Physics Stage -->
+          <div class="sim-canvas-box" id="newton-stage">
+            <div class="newton-track"></div>
+            <div class="newton-ball" id="newton-ball">
+              <span id="ball-mass-text">5kg</span>
+            </div>
+
+            <div style="position: absolute; top: 15px; left: 20px; font-size: 0.8rem; color: var(--text-muted);">
+              Track Length: 100 meters | Surface: Low Friction
+            </div>
+          </div>
+
+          <!-- Controls Grid -->
+          <div class="sim-controls-grid">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">
+                Applied Force: <strong id="force-val" style="color: var(--accent);">50 N</strong>
+              </label>
+              <input type="range" id="force-slider" min="0" max="100" value="50" style="width: 100%; accent-color: var(--accent);">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">
+                Object Mass: <strong id="mass-val" style="color: var(--secondary);">5 kg</strong>
+              </label>
+              <input type="range" id="mass-slider" min="1" max="20" value="5" style="width: 100%; accent-color: var(--secondary);">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Kinetic Friction</label>
+              <select id="friction-select" class="form-select" style="padding: 0.6rem 1rem;">
+                <option value="0">Frictionless (μ = 0.00)</option>
+                <option value="0.1">Polished Ice (μ = 0.10)</option>
+                <option value="0.3">Wood on Wood (μ = 0.30)</option>
+              </select>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-accent" id="newton-start-btn">
+                <i class="fa-solid fa-play"></i> Run
+              </button>
+              <button class="btn btn-outline" id="newton-reset-btn">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Telemetry Readouts -->
+          <div class="sim-telemetry-row">
+            <div class="telemetry-item">
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Acceleration (a = F/m)</div>
+              <div id="telemetry-accel" style="font-size: 1.35rem; font-weight: 800; color: var(--accent);">10.0 m/s²</div>
+            </div>
+            <div class="telemetry-item">
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Current Velocity (v)</div>
+              <div id="telemetry-vel" style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF;">0.0 m/s</div>
+            </div>
+            <div class="telemetry-item">
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Position (x)</div>
+              <div id="telemetry-pos" style="font-size: 1.35rem; font-weight: 800; color: var(--primary-light);">0.0 m</div>
+            </div>
+            <div class="telemetry-item">
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Kinetic Energy (E = ½mv²)</div>
+              <div id="telemetry-ke" style="font-size: 1.35rem; font-weight: 800; color: var(--gold);">0.0 J</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Multi Simulation 2x2 Grid -->
+        <div class="sims-grid">
+          
+          <!-- Lab 2: Ohm's Law Circuit Simulator -->
+          <div class="glass-card" style="padding: 1.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span class="badge badge-primary">CIRCUIT ELECTRONICS</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Ohm's Law: V = I × R</span>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Interactive DC Circuit & Bulb</h3>
+
+            <!-- Circuit Stage -->
+            <div class="circuit-board" style="margin-bottom: 1.5rem;">
+              <div class="circuit-wire"></div>
+              <div class="circuit-bulb" id="circuit-bulb">
+                <i class="fa-solid fa-lightbulb"></i>
+              </div>
+              <div class="circuit-battery" id="circuit-battery">12 V</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <label class="form-label">Voltage (V): <strong id="voltage-label" style="color: var(--primary-light);">12 V</strong></label>
+                <input type="range" id="voltage-slider" min="1" max="24" value="12" style="width: 100%; accent-color: var(--primary);">
+              </div>
+              <div>
+                <label class="form-label">Resistance (R): <strong id="resistance-label" style="color: var(--secondary);">6 Ω</strong></label>
+                <input type="range" id="resistance-slider" min="1" max="20" value="6" style="width: 100%; accent-color: var(--secondary);">
+              </div>
+            </div>
+
+            <div class="sim-telemetry-row" style="margin-top: 0; grid-template-columns: 1fr 1fr;">
+              <div class="telemetry-item">
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Electric Current (I = V/R)</div>
+                <div id="current-label" style="font-size: 1.35rem; font-weight: 800; color: var(--accent);">2.00 A</div>
+              </div>
+              <div class="telemetry-item">
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Bulb Power (P = V × I)</div>
+                <div id="power-label" style="font-size: 1.35rem; font-weight: 800; color: var(--gold);">24.0 W</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lab 3: Harmonic Pendulum Motion -->
+          <div class="glass-card" style="padding: 1.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span class="badge badge-secondary">HARMONIC OSCILLATOR</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">T = 2π√(L/g)</span>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Pendulum Gravity Simulator</h3>
+
+            <div class="sim-canvas-box pendulum-stage" id="pendulum-stage" style="margin-bottom: 1.5rem;">
+              <div class="pendulum-pivot"></div>
+              <div class="pendulum-arm" id="pendulum-arm" style="height: 120px;">
+                <div class="pendulum-bob"></div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <label class="form-label">Rod Length: <strong id="pendulum-len-label" style="color: var(--secondary);">1.2 m</strong></label>
+                <input type="range" id="pendulum-len-slider" min="0.5" max="2.5" step="0.1" value="1.2" style="width: 100%; accent-color: var(--secondary);">
+              </div>
+              <div>
+                <label class="form-label">Celestial Gravity</label>
+                <select id="gravity-select" class="form-select" style="padding: 0.55rem 0.85rem;">
+                  <option value="9.8">Earth (g = 9.8 m/s²)</option>
+                  <option value="1.62">Moon (g = 1.62 m/s²)</option>
+                  <option value="24.79">Jupiter (g = 24.8 m/s²)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sim-telemetry-row" style="margin-top: 0; grid-template-columns: 1fr 1fr;">
+              <div class="telemetry-item">
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Calculated Period (T)</div>
+                <div id="pendulum-period-label" style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF;">2.20 s</div>
+              </div>
+              <div class="telemetry-item">
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Frequency (f = 1/T)</div>
+                <div id="pendulum-freq-label" style="font-size: 1.35rem; font-weight: 800; color: var(--accent);">0.45 Hz</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lab 4: Cellular Biology Organelle Explorer -->
+          <div class="glass-card" style="padding: 1.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span class="badge badge-accent">CELLULAR BIOLOGY</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Click organelles to inspect</span>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Eukaryotic Cell Organelle Inspector</h3>
+
+            <div class="circuit-board" style="height: 200px; padding: 1rem; margin-bottom: 1.25rem;">
+              <svg viewBox="0 0 400 200" class="cell-interactive-svg">
+                <!-- Cell Membrane Outer Boundary -->
+                <ellipse cx="200" cy="100" rx="180" ry="85" fill="rgba(67, 233, 123, 0.08)" stroke="#43E97B" stroke-width="3" stroke-dasharray="5 3"/>
+                <!-- Cytoplasm Info -->
+                <text x="50" y="40" fill="rgba(255,255,255,0.4)" font-size="11">Cytosol Fluid</text>
+                
+                <!-- Nucleus -->
+                <g class="organelle" onclick="inspectOrganelle('Nucleus')">
+                  <circle cx="160" cy="100" r="42" fill="rgba(108, 99, 255, 0.4)" stroke="#6C63FF" stroke-width="2"/>
+                  <circle cx="160" cy="100" r="18" fill="#6C63FF"/>
+                  <text x="140" y="104" fill="#FFFFFF" font-size="11" font-weight="700">DNA</text>
+                </g>
+
+                <!-- Mitochondria -->
+                <g class="organelle" onclick="inspectOrganelle('Mitochondria')">
+                  <ellipse cx="270" cy="70" rx="30" ry="16" fill="rgba(255, 101, 132, 0.4)" stroke="#FF6584" stroke-width="2"/>
+                  <path d="M 250 70 Q 260 62 270 70 T 290 70" stroke="#FF6584" stroke-width="2" fill="none"/>
+                  <text x="250" y="74" fill="#FFFFFF" font-size="9" font-weight="600">ATP</text>
+                </g>
+
+                <!-- Golgi Body -->
+                <g class="organelle" onclick="inspectOrganelle('Golgi Apparatus')">
+                  <path d="M 255 125 Q 275 115 295 125 M 250 135 Q 275 125 300 135 M 255 145 Q 275 135 295 145" stroke="#FFD700" stroke-width="3" fill="none"/>
+                  <text x="260" y="160" fill="#FFD700" font-size="10">Golgi</text>
+                </g>
+
+                <!-- Ribosomes -->
+                <circle cx="95" cy="120" r="4" fill="#43E97B" class="organelle" onclick="inspectOrganelle('Ribosome')"/>
+                <circle cx="110" cy="135" r="4" fill="#43E97B" class="organelle" onclick="inspectOrganelle('Ribosome')"/>
+                <circle cx="85" cy="85" r="4" fill="#43E97B" class="organelle" onclick="inspectOrganelle('Ribosome')"/>
+              </svg>
+            </div>
+
+            <!-- Organelle Detail Card -->
+            <div id="organelle-card" class="glass-card" style="padding: 1rem; background: rgba(255, 255, 255, 0.03);">
+              <div style="font-weight: 700; color: var(--accent); margin-bottom: 0.25rem;" id="org-name">Click any organelle in the cell</div>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;" id="org-desc">
+                Select the Nucleus, Mitochondria, Golgi Apparatus, or Ribosomes to explore their cellular mechanisms.
+              </p>
+            </div>
+          </div>
+
+          <!-- Lab 5: Canvas Math Function Grapher -->
+          <div class="glass-card" style="padding: 1.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span class="badge badge-warning">CALCULUS & ALGEBRA</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Real-time HTML5 Canvas</span>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Interactive Function Curve Plotter</h3>
+
+            <div class="sim-canvas-box" style="height: 190px; margin-bottom: 1.25rem;">
+              <canvas id="math-graph-canvas" style="width: 100%; height: 100%;"></canvas>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+              <div>
+                <label class="form-label">Function Equation</label>
+                <select id="math-function-select" class="form-select" style="padding: 0.55rem 0.85rem;">
+                  <option value="sin">f(x) = A • sin(ωx)</option>
+                  <option value="cos">f(x) = A • cos(ωx)</option>
+                  <option value="quad">f(x) = A • x²</option>
+                  <option value="cubic">f(x) = x³ - 3x</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label">Amplitude / Scale (A): <strong id="amp-val" style="color: var(--warning);">1.5</strong></label>
+                <input type="range" id="amp-slider" min="0.5" max="3" step="0.1" value="1.5" style="width: 100%; accent-color: var(--warning);">
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary);">
+              <span>Domain: [-2π, +2π]</span>
+              <span id="math-derivative" style="color: var(--primary-light);">Derivative: f'(x) = Aω cos(ωx)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Experiment Journal History -->
+        <div class="glass-card" style="padding: 1.85rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <div>
+              <h2 style="font-size: 1.35rem;">Experiment Journal & Logs</h2>
+              <p style="font-size: 0.85rem; color: var(--text-secondary);">Completed virtual laboratory trials recorded for academic credit.</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="window.print()">
+              <i class="fa-solid fa-download"></i> Export Journal
+            </button>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="journal-table">
+              <thead>
+                <tr>
+                  <th>Experiment Name</th>
+                  <th>Domain</th>
+                  <th>Parameters Tested</th>
+                  <th>Output / Result</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Newton Force & Mass</strong></td>
+                  <td><span class="tag">Physics</span></td>
+                  <td>F = 50N, m = 5kg, μ = 0.0</td>
+                  <td>a = 10.0 m/s², E = 2500 J</td>
+                  <td><span class="badge badge-accent">Verified</span></td>
+                  <td>Today</td>
+                </tr>
+                <tr>
+                  <td><strong>Ohm's Law Circuit</strong></td>
+                  <td><span class="tag">Electronics</span></td>
+                  <td>V = 12V, R = 6Ω</td>
+                  <td>I = 2.0A, P = 24.0W</td>
+                  <td><span class="badge badge-accent">Verified</span></td>
+                  <td>Yesterday</td>
+                </tr>
+                <tr>
+                  <td><strong>Lunar Pendulum Motion</strong></td>
+                  <td><span class="tag">Astronomy</span></td>
+                  <td>L = 1.2m, Moon g = 1.62m/s²</td>
+                  <td>Period T = 5.41 s</td>
+                  <td><span class="badge badge-accent">Verified</span></td>
+                  <td>2 days ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth(true);
+      initNavUser();
+
+      initNewtonSimulation();
+      initCircuitSimulation();
+      initPendulumSimulation();
+      initMathPlotter();
+    });
+
+    // ========================================================
+    // 1. Newton Simulation Physics Engine
+    // ========================================================
+    let newtonAnim = null;
+    let newtonRunning = false;
+    let ballPos = 30;
+    let ballVel = 0;
+
+    function initNewtonSimulation() {
+      const forceSlider = document.getElementById('force-slider');
+      const massSlider = document.getElementById('mass-slider');
+      const frictionSelect = document.getElementById('friction-select');
+      const startBtn = document.getElementById('newton-start-btn');
+      const resetBtn = document.getElementById('newton-reset-btn');
+      const ball = document.getElementById('newton-ball');
+
+      function updateValues() {
+        const force = parseFloat(forceSlider.value);
+        const mass = parseFloat(massSlider.value);
+        const friction = parseFloat(frictionSelect.value);
+
+        document.getElementById('force-val').textContent = `${force} N`;
+        document.getElementById('mass-val').textContent = `${mass} kg`;
+        document.getElementById('ball-mass-text').textContent = `${mass}kg`;
+
+        // Net force = Applied - Friction * Normal Force
+        const frictionForce = friction * mass * 9.8;
+        const netForce = Math.max(0, force - frictionForce);
+        const accel = netForce / mass;
+
+        document.getElementById('telemetry-accel').textContent = `${accel.toFixed(1)} m/s²`;
+      }
+
+      forceSlider.addEventListener('input', updateValues);
+      massSlider.addEventListener('input', updateValues);
+      frictionSelect.addEventListener('change', updateValues);
+      updateValues();
+
+      startBtn.addEventListener('click', () => {
+        newtonRunning = !newtonRunning;
+        if (newtonRunning) {
+          startBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
+          runNewtonLoop();
+        } else {
+          startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Run`;
+          cancelAnimationFrame(newtonAnim);
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        newtonRunning = false;
+        cancelAnimationFrame(newtonAnim);
+        startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Run`;
+        ballPos = 30;
+        ballVel = 0;
+        ball.style.left = `${ballPos}px`;
+        document.getElementById('telemetry-vel').textContent = '0.0 m/s';
+        document.getElementById('telemetry-pos').textContent = '0.0 m';
+        document.getElementById('telemetry-ke').textContent = '0.0 J';
+      });
+
+      function runNewtonLoop() {
+        if (!newtonRunning) return;
+
+        const force = parseFloat(forceSlider.value);
+        const mass = parseFloat(massSlider.value);
+        const friction = parseFloat(frictionSelect.value);
+        const netForce = Math.max(0, force - (friction * mass * 9.8));
+        const accel = netForce / mass;
+
+        const dt = 0.05;
+        ballVel += accel * dt;
+        ballPos += ballVel * dt * 8; // scaled for pixels
+
+        const stageWidth = document.getElementById('newton-stage').clientWidth;
+        if (ballPos > stageWidth - 60) {
+          ballPos = stageWidth - 60;
+          newtonRunning = false;
+          startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Run`;
+          showToast('Experiment concluded! Telemetry logged.', 'success');
+        }
+
+        ball.style.left = `${ballPos}px`;
+        document.getElementById('telemetry-vel').textContent = `${ballVel.toFixed(1)} m/s`;
+        document.getElementById('telemetry-pos').textContent = `${((ballPos - 30) / 5).toFixed(1)} m`;
+        const ke = 0.5 * mass * Math.pow(ballVel, 2);
+        document.getElementById('telemetry-ke').textContent = `${ke.toFixed(0)} J`;
+
+        if (newtonRunning) {
+          newtonAnim = requestAnimationFrame(runNewtonLoop);
+        }
+      }
+    }
+
+    // ========================================================
+    // 2. Ohm's Law Circuit Engine
+    // ========================================================
+    function initCircuitSimulation() {
+      const vSlider = document.getElementById('voltage-slider');
+      const rSlider = document.getElementById('resistance-slider');
+      const bulb = document.getElementById('circuit-bulb');
+
+      function updateCircuit() {
+        const v = parseFloat(vSlider.value);
+        const r = parseFloat(rSlider.value);
+        const i = v / r;
+        const p = v * i;
+
+        document.getElementById('voltage-label').textContent = `${v} V`;
+        document.getElementById('resistance-label').textContent = `${r} Ω`;
+        document.getElementById('circuit-battery').textContent = `${v} V`;
+        document.getElementById('current-label').textContent = `${i.toFixed(2)} A`;
+        document.getElementById('power-label').textContent = `${p.toFixed(1)} W`;
+
+        // Visual brightness change
+        const brightness = Math.min(60, p * 1.5 + 5);
+        bulb.style.boxShadow = `0 0 ${brightness}px rgba(255, 230, 0, ${Math.min(1, p / 30 + 0.2)})`;
+      }
+
+      vSlider.addEventListener('input', updateCircuit);
+      rSlider.addEventListener('input', updateCircuit);
+      updateCircuit();
+    }
+
+    // ========================================================
+    // 3. Pendulum Motion Simulation
+    // ========================================================
+    let pendulumAngle = 0;
+    let pendulumRunning = true;
+
+    function initPendulumSimulation() {
+      const lenSlider = document.getElementById('pendulum-len-slider');
+      const gravSelect = document.getElementById('gravity-select');
+      const arm = document.getElementById('pendulum-arm');
+
+      function updatePendulum() {
+        const L = parseFloat(lenSlider.value);
+        const g = parseFloat(gravSelect.value);
+        const T = 2 * Math.PI * Math.sqrt(L / g);
+        const f = 1 / T;
+
+        document.getElementById('pendulum-len-label').textContent = `${L.toFixed(1)} m`;
+        document.getElementById('pendulum-period-label').textContent = `${T.toFixed(2)} s`;
+        document.getElementById('pendulum-freq-label').textContent = `${f.toFixed(2)} Hz`;
+
+        arm.style.height = `${L * 80}px`;
+      }
+
+      lenSlider.addEventListener('input', updatePendulum);
+      gravSelect.addEventListener('change', updatePendulum);
+      updatePendulum();
+
+      let startTime = Date.now();
+      function swing() {
+        const L = parseFloat(lenSlider.value);
+        const g = parseFloat(gravSelect.value);
+        const omega = Math.sqrt(g / L);
+        const elapsed = (Date.now() - startTime) / 1000;
+        const maxAngle = 25; // degrees
+        const currentAngle = maxAngle * Math.cos(omega * elapsed);
+
+        arm.style.transform = `rotate(${currentAngle}deg)`;
+        requestAnimationFrame(swing);
+      }
+      swing();
+    }
+
+    // ========================================================
+    // 4. Cellular Biology Inspector
+    // ========================================================
+    const organelleData = {
+      'Nucleus': {
+        name: 'Nucleus (The Command Center)',
+        desc: 'Houses eukaryotic chromosomes (DNA). Directs all cellular synthesis, transcription of mRNA, and ribosomal biogenesis via the inner nucleolus.'
+      },
+      'Mitochondria': {
+        name: 'Mitochondria (The Powerhouse of the Cell)',
+        desc: 'Generates cellular ATP through the Krebs cycle and oxidative phosphorylation via its inner folded cristae membrane.'
+      },
+      'Golgi Apparatus': {
+        name: 'Golgi Apparatus (Packaging & Shipping)',
+        desc: 'Modifies, sorts, and packages proteins and lipid vesicles received from the endoplasmic reticulum for secretion or intracellular delivery.'
+      },
+      'Ribosome': {
+        name: 'Ribosomes (Protein Factories)',
+        desc: 'Catalyzes peptidyl transfer, translating genetic messenger RNA transcripts into functional polypeptide chains.'
+      }
+    };
+
+    function inspectOrganelle(name) {
+      const data = organelleData[name];
+      if (data) {
+        document.getElementById('org-name').textContent = data.name;
+        document.getElementById('org-desc').textContent = data.desc;
+        showToast(`Inspecting: ${name}`, 'info', 2000);
+      }
+    }
+
+    // ========================================================
+    // 5. Canvas Math Function Plotter
+    // ========================================================
+    function initMathPlotter() {
+      const canvas = document.getElementById('math-graph-canvas');
+      const ctx = canvas.getContext('2d');
+      const fnSelect = document.getElementById('math-function-select');
+      const ampSlider = document.getElementById('amp-slider');
+
+      function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        plot();
+      }
+      window.addEventListener('resize', resize);
+
+      function plot() {
+        if (!canvas.width || !canvas.height) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const w = canvas.width;
+        const h = canvas.height;
+        const midY = h / 2;
+        const midX = w / 2;
+
+        // Draw Axes
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, midY);
+        ctx.lineTo(w, midY);
+        ctx.moveTo(midX, 0);
+        ctx.lineTo(midX, h);
+        ctx.stroke();
+
+        // Plot Function
+        const A = parseFloat(ampSlider.value);
+        const fnType = fnSelect.value;
+        document.getElementById('amp-val').textContent = A.toFixed(1);
+
+        const derivLabel = document.getElementById('math-derivative');
+        if (fnType === 'sin') derivLabel.textContent = `Derivative: f'(x) = ${A.toFixed(1)} cos(x)`;
+        if (fnType === 'cos') derivLabel.textContent = `Derivative: f'(x) = -${A.toFixed(1)} sin(x)`;
+        if (fnType === 'quad') derivLabel.textContent = `Derivative: f'(x) = ${(2*A).toFixed(1)} x`;
+        if (fnType === 'cubic') derivLabel.textContent = `Derivative: f'(x) = 3x² - 3`;
+
+        ctx.strokeStyle = '#43E97B';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+
+        const scaleX = 40;
+        const scaleY = 35 * A;
+
+        for (let px = 0; px < w; px++) {
+          const x = (px - midX) / scaleX;
+          let y = 0;
+
+          if (fnType === 'sin') y = Math.sin(x);
+          if (fnType === 'cos') y = Math.cos(x);
+          if (fnType === 'quad') y = Math.pow(x, 2) * 0.3;
+          if (fnType === 'cubic') y = (Math.pow(x, 3) - 3 * x) * 0.15;
+
+          const py = midY - (y * scaleY);
+          if (px === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+
+      fnSelect.addEventListener('change', plot);
+      ampSlider.addEventListener('input', plot);
+      setTimeout(resize, 100);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | EduPlay - UnityLearn</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="css/main.css">
+
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.5rem;
+      position: relative;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 1100px;
+      min-height: 680px;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border-color);
+      background: rgba(23, 23, 40, 0.7);
+      backdrop-filter: blur(24px);
+    }
+
+    .auth-visual-side {
+      background: radial-gradient(circle at 30% 30%, rgba(255, 101, 132, 0.25) 0%, rgba(15, 15, 26, 0.95) 100%);
+      padding: 3.5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .auth-form-side {
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Password strength bar */
+    .strength-meter-wrap {
+      margin-top: 0.4rem;
+    }
+
+    .strength-bar-track {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 0.35rem;
+    }
+
+    .strength-bar-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      border-radius: var(--radius-full);
+    }
+
+    .strength-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Gamified Quest Perks List */
+    .perks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin: 2rem 0;
+    }
+
+    .perk-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .perk-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .auth-container {
+        grid-template-columns: 1fr;
+      }
+      .auth-visual-side {
+        display: none;
+      }
+      .auth-form-side {
+        padding: 2rem 1.5rem;
+      }
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-container glass-card">
+      
+      <!-- Left Visual Perks Side -->
+      <div class="auth-visual-side">
+        <a href="index.html" class="nav-brand">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay<span style="color: var(--primary);"> - UnityLearn</span></span>
+        </a>
+
+        <div>
+          <div class="badge badge-secondary" style="margin-bottom: 1rem;">FREE STUDENT ACCESS</div>
+          <h2 style="font-size: 2rem; margin-bottom: 1rem;">Begin Your Epic Learning Quest</h2>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+            Create your account to unlock interactive physics labs, climb the competitive ranks, 
+            and earn verified digital skill badges.
+          </p>
+
+          <div class="perks-list">
+            <div class="perk-item">
+              <div class="perk-icon" style="background: rgba(108, 99, 255, 0.2); color: var(--primary-light);">
+                <i class="fa-solid fa-award"></i>
+              </div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">Earn 100 Starting XP</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Instantly unlock the Level 1 Scholar achievement.</p>
+              </div>
+            </div>
+
+            <div class="perk-item">
+              <div class="perk-icon" style="background: rgba(67, 233, 123, 0.2); color: var(--accent);">
+                <i class="fa-solid fa-atom"></i>
+              </div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">Unlimited Simulation Access</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Physics, chemistry, and circuit sandbox labs.</p>
+              </div>
+            </div>
+
+            <div class="perk-item">
+              <div class="perk-icon" style="background: rgba(255, 101, 132, 0.2); color: var(--secondary);">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">Peer Study Guilds</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Collaborate in live chat rooms and code forums.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          Already over 10,000 active scholars learning together worldwide.
+        </div>
+      </div>
+
+      <!-- Right Registration Form -->
+      <div class="auth-form-side">
+        <div style="margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Create Your Account 🚀</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Takes less than 60 seconds to get your avatar ready.</p>
+        </div>
+
+        <!-- Alert Error Message -->
+        <div id="register-alert" class="alert alert-danger" style="display: none;">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="register-alert-text">Error creating account</span>
+        </div>
+
+        <form id="register-form">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="first-name">First Name</label>
+              <input type="text" id="first-name" class="form-input" placeholder="e.g. Alex" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="last-name">Last Name</label>
+              <input type="text" id="last-name" class="form-input" placeholder="e.g. Hunter" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-with-icon">
+              <input type="text" id="username" class="form-input" placeholder="alex_hunter" required autocomplete="username">
+              <i class="fa-solid fa-at"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <div class="input-with-icon">
+              <input type="email" id="email" class="form-input" placeholder="alex@university.edu" required autocomplete="email">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <div class="input-with-icon">
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="new-password">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+              <div class="strength-meter-wrap">
+                <div class="strength-bar-track">
+                  <div id="strength-fill" class="strength-bar-fill"></div>
+                </div>
+                <div class="strength-label">
+                  <span>Strength:</span>
+                  <span id="strength-text">Empty</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirm-password">Confirm Password</label>
+              <div class="input-with-icon">
+                <input type="password" id="confirm-password" class="form-input" placeholder="••••••••" required autocomplete="new-password">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 0.5rem;">
+            <label class="form-check">
+              <input type="checkbox" id="terms" class="form-check-input" required checked>
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">
+                I agree to the <a href="#" style="color: var(--primary-light);">Terms of Service</a> & <a href="#" style="color: var(--primary-light);">Honor Code</a>
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" id="register-submit-btn" class="btn btn-primary" style="width: 100%; padding: 0.9rem; margin-top: 0.5rem;">
+            <span id="reg-btn-text"><i class="fa-solid fa-rocket"></i> Register & Enter Arena</span>
+            <span id="reg-btn-spinner" class="spinner" style="display: none;"></span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+          Already have an account? 
+          <a href="login.html" style="color: var(--primary-light); font-weight: 600;">Sign in here</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const form = document.getElementById('register-form');
+    const alertBox = document.getElementById('register-alert');
+    const alertText = document.getElementById('register-alert-text');
+    const submitBtn = document.getElementById('register-submit-btn');
+    const btnText = document.getElementById('reg-btn-text');
+    const btnSpinner = document.getElementById('reg-btn-spinner');
+
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const strengthFill = document.getElementById('strength-fill');
+    const strengthText = document.getElementById('strength-text');
+
+    // Password strength evaluator
+    passwordInput.addEventListener('input', () => {
+      const val = passwordInput.value;
+      let score = 0;
+      if (val.length >= 6) score += 25;
+      if (val.length >= 10) score += 25;
+      if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score += 25;
+      if (/[^A-Za-z0-9]/.test(val)) score += 25;
+
+      strengthFill.style.width = score + '%';
+      if (score === 0) {
+        strengthText.textContent = 'Empty';
+        strengthFill.style.backgroundColor = 'transparent';
+      } else if (score <= 25) {
+        strengthText.textContent = 'Weak';
+        strengthFill.style.backgroundColor = 'var(--danger)';
+      } else if (score <= 50) {
+        strengthText.textContent = 'Fair';
+        strengthFill.style.backgroundColor = 'var(--warning)';
+      } else if (score <= 75) {
+        strengthText.textContent = 'Good';
+        strengthFill.style.backgroundColor = 'var(--info)';
+      } else {
+        strengthText.textContent = 'Strong 🔥';
+        strengthFill.style.backgroundColor = 'var(--accent)';
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+
+      const firstName = document.getElementById('first-name').value.trim();
+      const lastName = document.getElementById('last-name').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+
+      if (password !== confirmPassword) {
+        alertBox.style.display = 'flex';
+        alertText.textContent = 'Passwords do not match. Please re-enter.';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      btnText.style.display = 'none';
+      btnSpinner.style.display = 'inline-block';
+
+      try {
+        const res = await EduPlayAPI.register({
+          first_name: firstName,
+          last_name: lastName,
+          username,
+          email,
+          password
+        });
+
+        showToast('Account registered successfully! Welcome to EduPlay 🎉', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 800);
+      } catch (err) {
+        alertBox.style.display = 'flex';
+        alertText.textContent = err.message || 'Registration failed. Try a different username or email.';
+        submitBtn.disabled = false;
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

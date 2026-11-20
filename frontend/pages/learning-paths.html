@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adaptive Learning Paths | EduPlay - UnityLearn</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="../css/main.css">
+
+  <style>
+    /* Learning Path Connected Nodes Visualizer */
+    .roadmap-track {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      padding: 2.5rem 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .roadmap-line {
+      position: absolute;
+      top: 50%;
+      left: 60px;
+      right: 60px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .roadmap-line-progress {
+      position: absolute;
+      top: 50%;
+      left: 60px;
+      width: 45%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      transform: translateY(-50%);
+      z-index: 2;
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .roadmap-node {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .node-icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--bg-surface-elevated);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .roadmap-node.completed .node-icon-circle {
+      border-color: var(--accent);
+      background: rgba(67, 233, 123, 0.2);
+      color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .roadmap-node.current .node-icon-circle {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 0 25px var(--primary-glow);
+      animation: pulse 2.5s infinite ease-in-out;
+    }
+
+    .node-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-top: 0.75rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .roadmap-node.current .node-label {
+      color: #FFFFFF;
+    }
+
+    /* Course Catalog Grid */
+    .course-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .course-card {
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .course-thumbnail {
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .course-thumb-icon {
+      font-size: 3.5rem;
+      color: rgba(255, 255, 255, 0.85);
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+    }
+
+    .course-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .course-meta-row {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    /* Accordion in Course Modal */
+    .accordion-item {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .accordion-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .accordion-header:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .accordion-content {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    .accordion-content.show {
+      display: block;
+    }
+
+    @media (max-width: 1100px) {
+      .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+      .roadmap-track {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .roadmap-line, .roadmap-line-progress {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Unified Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-brand">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay</span>
+        </a>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="sidebar-heading">Navigation</div>
+        
+        <a href="../dashboard.html" class="nav-link-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="game-learning.html" class="nav-link-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Game Learning</span>
+          <span class="nav-pill">XP</span>
+        </a>
+
+        <a href="simulations.html" class="nav-link-item">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Simulations</span>
+          <span class="nav-pill" style="background: rgba(67, 233, 123, 0.18); color: var(--accent);">Labs</span>
+        </a>
+
+        <a href="learning-paths.html" class="nav-link-item active">
+          <i class="fa-solid fa-route"></i>
+          <span>Learning Paths</span>
+        </a>
+
+        <a href="collaborative.html" class="nav-link-item">
+          <i class="fa-solid fa-users"></i>
+          <span>Collaborative</span>
+        </a>
+
+        <a href="analytics.html" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+
+        <a href="authoring.html" class="nav-link-item">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>Authoring</span>
+        </a>
+
+        <div class="sidebar-heading" style="margin-top: 1rem;">System</div>
+        <a href="#" onclick="logout(); return false;" class="nav-link-item" style="color: var(--secondary);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar user-avatar-initials">AH</div>
+          <div class="user-details">
+            <div class="user-name user-name-display">Alex Hunter</div>
+            <div class="user-role user-level-display">Level 12 Scholar</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      
+      <!-- Top Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="course-search-input" placeholder="Search courses, instructors, tracks...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="gamification-pill pill-streak user-streak-badge">
+            <i class="fa-solid fa-fire text-secondary"></i> <span>7 Days</span>
+          </div>
+
+          <div class="gamification-pill pill-xp user-xp-badge">
+            <i class="fa-solid fa-bolt text-gold"></i> <span>2,450 XP</span>
+          </div>
+
+          <div class="user-avatar user-avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem; cursor: pointer;">AH</div>
+        </div>
+      </header>
+
+      <!-- Main Body -->
+      <main class="page-container">
+        
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">
+              <i class="fa-solid fa-compass text-secondary"></i>
+              <span>Adaptive Learning Paths & Courses</span>
+            </h1>
+            <p class="page-subtitle">AI-curated milestones that evolve dynamically according to your quiz accuracy.</p>
+          </div>
+
+          <button class="btn btn-outline btn-sm" onclick="showToast('Diagnostic recalibrated with recent test results!', 'success')">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Recalibrate Path
+          </button>
+        </div>
+
+        <!-- AI Diagnostic Banner -->
+        <div class="glass-card" style="padding: 1.5rem 2rem; margin-bottom: 2.5rem; background: radial-gradient(circle at 95% 50%, rgba(108, 99, 255, 0.2) 0%, rgba(23, 23, 40, 0.8) 100%), var(--bg-card); border-left: 4px solid var(--primary);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <span class="badge badge-primary" style="margin-bottom: 0.4rem;">AI ASSESSMENT RECOMMENDATION</span>
+              <h3 style="font-size: 1.25rem; margin-bottom: 0.35rem;">High Aptitude in Data Structures Detected</h3>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); max-width: 650px;">
+                Based on your 100% score on the Python Trees & Graphs quiz, you can skip Foundations and advance straight to <strong>Full-Stack Gamified Systems</strong>.
+              </p>
+            </div>
+            <button class="btn btn-primary" onclick="openCourseModal(1)">
+              Fast-Track Milestone <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Connected Roadmap Tree -->
+        <div class="glass-card" style="padding: 2rem; margin-bottom: 3.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h2 style="font-size: 1.35rem;">Track Roadmap: Full-Stack Architect</h2>
+            <span class="badge badge-accent">Stage 2 of 5 Active</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Click on any milestone to view learning objectives and prerequisites.</p>
+
+          <div class="roadmap-track">
+            <div class="roadmap-line"></div>
+            <div class="roadmap-line-progress"></div>
+
+            <div class="roadmap-node completed" onclick="showToast('Milestone 1 Completed: Verified 100% Score', 'info')">
+              <div class="node-icon-circle">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <div class="node-label">1. Fundamentals</div>
+            </div>
+
+            <div class="roadmap-node current" onclick="openCourseModal(1)">
+              <div class="node-icon-circle">
+                <i class="fa-solid fa-code"></i>
+              </div>
+              <div class="node-label">2. Gamified Systems (65%)</div>
+            </div>
+
+            <div class="roadmap-node" onclick="showToast('Locked: Complete Milestone 2 first.', 'error')">
+              <div class="node-icon-circle">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+              <div class="node-label">3. Microservices</div>
+            </div>
+
+            <div class="roadmap-node" onclick="showToast('Locked: Complete Milestone 2 first.', 'error')">
+              <div class="node-icon-circle">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+              <div class="node-label">4. AI Agents</div>
+            </div>
+
+            <div class="roadmap-node" onclick="showToast('Locked: Final Capstone Project', 'error')">
+              <div class="node-icon-circle">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div class="node-label">5. Capstone Project</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Catalog Section -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h2 style="font-size: 1.45rem;">Curated STEM Course Catalog</h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);" id="courses-count-label">4 Courses</span>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="course-filter-bar">
+          <div style="flex: 1; min-width: 220px;">
+            <select id="filter-subject" class="form-select">
+              <option value="all">All Subjects</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Physics">Physics & Chemistry</option>
+              <option value="Artificial Intelligence">Artificial Intelligence</option>
+              <option value="Mathematics">Mathematics</option>
+            </select>
+          </div>
+
+          <div style="flex: 1; min-width: 200px;">
+            <select id="filter-difficulty" class="form-select">
+              <option value="all">Any Difficulty</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+
+          <button class="btn btn-outline" id="filter-reset-btn">
+            <i class="fa-solid fa-rotate-left"></i> Reset
+          </button>
+        </div>
+
+        <!-- Courses Grid -->
+        <div class="courses-grid" id="courses-grid-container">
+          <!-- Dynamically populated -->
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Course Detail Modal -->
+  <div class="modal-overlay" id="course-modal">
+    <div class="modal-content" style="max-width: 720px;">
+      
+      <div class="modal-header">
+        <div>
+          <span class="badge badge-primary" id="modal-course-subject" style="margin-bottom: 0.25rem;">Subject</span>
+          <h3 class="modal-title" id="modal-course-title">Course Title</h3>
+        </div>
+        <button class="modal-close" onclick="closeCourseModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="modal-course-desc" style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.6;">
+          Description here...
+        </p>
+
+        <div class="glass-card" style="padding: 1.25rem; margin-bottom: 1.75rem; background: rgba(255, 255, 255, 0.03);">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 1rem;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Instructor</div>
+              <div id="modal-course-instructor" style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">Dr. Instructor</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Duration</div>
+              <div id="modal-course-duration" style="font-weight: 700; color: var(--accent); font-size: 0.95rem;">6 Weeks</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Difficulty</div>
+              <div id="modal-course-diff" style="font-weight: 700; color: var(--secondary); font-size: 0.95rem;">Intermediate</div>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="font-size: 1.1rem; margin-bottom: 1rem;">Course Curriculum</h4>
+        <div id="modal-course-curriculum">
+          <!-- Accordion modules -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCourseModal()">Close</button>
+        <button class="btn btn-primary" id="modal-enroll-btn">
+          <i class="fa-solid fa-bolt"></i> Enroll Now (Free)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    let allCourses = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      checkAuth(true);
+      initNavUser();
+
+      await loadCourses();
+      setupFilters();
+    });
+
+    async function loadCourses() {
+      try {
+        allCourses = await EduPlayAPI.getCourseList();
+        renderCourses(allCourses);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderCourses(courses) {
+      const container = document.getElementById('courses-grid-container');
+      const countLabel = document.getElementById('courses-count-label');
+      if (countLabel) countLabel.textContent = `${courses.length} Courses`;
+
+      container.innerHTML = courses.map(c => `
+        <div class="glass-card course-card">
+          <div class="course-thumbnail" style="background: ${c.thumbnail_gradient};">
+            <i class="fa-solid ${c.icon} course-thumb-icon"></i>
+            <span class="badge" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); color: #FFFFFF;">
+              ${c.difficulty}
+            </span>
+          </div>
+
+          <div class="course-body">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-light); text-transform: uppercase; margin-bottom: 0.4rem;">
+              ${c.subject}
+            </span>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; line-height: 1.35;">${c.title}</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem; flex: 1;">
+              ${c.description}
+            </p>
+
+            <div class="course-meta-row">
+              <div><i class="fa-regular fa-clock"></i> ${c.duration}</div>
+              <div><i class="fa-regular fa-folder-open"></i> ${c.lessons_count} Lessons</div>
+              <div><i class="fa-solid fa-users"></i> ${c.enrolled_count.toLocaleString()}</div>
+            </div>
+
+            ${c.is_enrolled ? `
+              <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 600; margin-bottom: 0.35rem;">
+                  <span>Progress</span>
+                  <span style="color: var(--accent);">${c.progress}%</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-fill progress-fill-accent" style="width: ${c.progress}%;"></div>
+                </div>
+              </div>
+            ` : ''}
+
+            <div style="display: flex; gap: 0.75rem; margin-top: auto;">
+              <button class="btn btn-outline btn-sm" style="flex: 1;" onclick="openCourseModal(${c.id})">
+                Syllabus
+              </button>
+              <button class="btn ${c.is_enrolled ? 'btn-accent' : 'btn-primary'} btn-sm" style="flex: 1.3;" onclick="handleEnroll(${c.id})">
+                ${c.is_enrolled ? '<i class="fa-solid fa-play"></i> Continue' : '<i class="fa-solid fa-plus"></i> Enroll'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setupFilters() {
+      const subjectSelect = document.getElementById('filter-subject');
+      const diffSelect = document.getElementById('filter-difficulty');
+      const searchInput = document.getElementById('course-search-input');
+      const resetBtn = document.getElementById('filter-reset-btn');
+
+      function filter() {
+        const sub = subjectSelect.value;
+        const diff = diffSelect.value;
+        const query = searchInput.value.toLowerCase();
+
+        const filtered = allCourses.filter(c => {
+          const matchSub = (sub === 'all') || (c.subject === sub);
+          const matchDiff = (diff === 'all') || (c.difficulty === diff);
+          const matchQuery = c.title.toLowerCase().includes(query) || c.instructor.toLowerCase().includes(query);
+          return matchSub && matchDiff && matchQuery;
+        });
+
+        renderCourses(filtered);
+      }
+
+      subjectSelect.addEventListener('change', filter);
+      diffSelect.addEventListener('change', filter);
+      searchInput.addEventListener('input', filter);
+
+      resetBtn.addEventListener('click', () => {
+        subjectSelect.value = 'all';
+        diffSelect.value = 'all';
+        searchInput.value = '';
+        renderCourses(allCourses);
+      });
+    }
+
+    // Modal Handling
+    let activeModalCourse = null;
+
+    function openCourseModal(courseId) {
+      activeModalCourse = allCourses.find(c => c.id === Number(courseId));
+      if (!activeModalCourse) return;
+
+      document.getElementById('modal-course-title').textContent = activeModalCourse.title;
+      document.getElementById('modal-course-subject').textContent = activeModalCourse.subject;
+      document.getElementById('modal-course-desc').textContent = activeModalCourse.description;
+      document.getElementById('modal-course-instructor').textContent = activeModalCourse.instructor;
+      document.getElementById('modal-course-duration').textContent = activeModalCourse.duration;
+      document.getElementById('modal-course-diff').textContent = activeModalCourse.difficulty;
+
+      const enrollBtn = document.getElementById('modal-enroll-btn');
+      enrollBtn.textContent = activeModalCourse.is_enrolled ? 'Continue Course' : 'Enroll Now (Free)';
+      enrollBtn.onclick = () => {
+        handleEnroll(activeModalCourse.id);
+        closeCourseModal();
+      };
+
+      // Populate Curriculum Accordion
+      const curriculumBox = document.getElementById('modal-course-curriculum');
+      curriculumBox.innerHTML = activeModalCourse.modules.map((mod, idx) => `
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <span>Module ${idx + 1}: ${mod.title}</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="accordion-content ${idx === 0 ? 'show' : ''}">
+            <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
+              ${mod.lessons.map(l => `
+                <li style="display: flex; align-items: center; gap: 0.6rem;">
+                  <i class="fa-regular fa-circle-play" style="color: var(--primary-light);"></i>
+                  <span>${l}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('course-modal').classList.add('active');
+    }
+
+    function toggleAccordion(header) {
+      const content = header.nextElementSibling;
+      content.classList.toggle('show');
+      const icon = header.querySelector('i');
+      if (content.classList.contains('show')) {
+        icon.className = 'fa-solid fa-chevron-up';
+      } else {
+        icon.className = 'fa-solid fa-chevron-down';
+      }
+    }
+
+    function closeCourseModal() {
+      document.getElementById('course-modal').classList.remove('active');
+    }
+
+    async function handleEnroll(courseId) {
+      const res = await EduPlayAPI.enrollCourse(courseId);
+      showToast(`Successfully enrolled in ${allCourses.find(c => c.id === Number(courseId))?.title}!`, 'success');
+      renderCourses(allCourses);
+    }
+  </script>
+</body>
+</html>

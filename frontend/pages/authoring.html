@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Authoring Studio | EduPlay - UnityLearn</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="../css/main.css">
+
+  <style>
+    /* Tabs Navigation */
+    .authoring-tabs {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .author-tab-btn {
+      padding: 0.85rem 1.5rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .author-tab-btn:hover {
+      color: #FFFFFF;
+    }
+
+    .author-tab-btn.active {
+      color: var(--primary-light);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Content Type Selection Cards */
+    .content-types-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .content-type-card {
+      padding: 1.6rem;
+      border-radius: var(--radius-md);
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .content-type-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+    }
+
+    .content-type-icon {
+      font-size: 2.2rem;
+      margin-bottom: 0.85rem;
+    }
+
+    /* Quiz Builder Form Layout */
+    .builder-layout-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+    }
+
+    .builder-question-card {
+      padding: 1.5rem;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .builder-opt-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+
+    /* Media Dropzone */
+    .upload-dropzone {
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 2.5rem;
+    }
+
+    .upload-dropzone:hover {
+      border-color: var(--primary);
+      background: rgba(108, 99, 255, 0.05);
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    .media-card {
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+
+    .media-thumb-box {
+      height: 110px;
+      border-radius: var(--radius-xs);
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: var(--primary-light);
+      margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 1024px) {
+      .content-types-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .builder-layout-grid {
+        grid-template-columns: 1fr;
+      }
+      .media-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .content-types-grid {
+        grid-template-columns: 1fr;
+      }
+      .media-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    
+    <!-- Unified Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="nav-brand">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay</span>
+        </a>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="sidebar-heading">Navigation</div>
+        
+        <a href="../dashboard.html" class="nav-link-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="game-learning.html" class="nav-link-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Game Learning</span>
+          <span class="nav-pill">XP</span>
+        </a>
+
+        <a href="simulations.html" class="nav-link-item">
+          <i class="fa-solid fa-flask-vial"></i>
+          <span>Simulations</span>
+          <span class="nav-pill" style="background: rgba(67, 233, 123, 0.18); color: var(--accent);">Labs</span>
+        </a>
+
+        <a href="learning-paths.html" class="nav-link-item">
+          <i class="fa-solid fa-route"></i>
+          <span>Learning Paths</span>
+        </a>
+
+        <a href="collaborative.html" class="nav-link-item">
+          <i class="fa-solid fa-users"></i>
+          <span>Collaborative</span>
+        </a>
+
+        <a href="analytics.html" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+
+        <a href="authoring.html" class="nav-link-item active">
+          <i class="fa-solid fa-pen-ruler"></i>
+          <span>Authoring</span>
+        </a>
+
+        <div class="sidebar-heading" style="margin-top: 1rem;">System</div>
+        <a href="#" onclick="logout(); return false;" class="nav-link-item" style="color: var(--secondary);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar user-avatar-initials">AH</div>
+          <div class="user-details">
+            <div class="user-name user-name-display">Alex Hunter</div>
+            <div class="user-role user-level-display">Level 12 Scholar</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      
+      <!-- Top Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" aria-label="Toggle Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search author drafts...">
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="gamification-pill pill-streak user-streak-badge">
+            <i class="fa-solid fa-fire text-secondary"></i> <span>7 Days</span>
+          </div>
+
+          <div class="gamification-pill pill-xp user-xp-badge">
+            <i class="fa-solid fa-bolt text-gold"></i> <span>2,450 XP</span>
+          </div>
+
+          <div class="user-avatar user-avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem; cursor: pointer;">AH</div>
+        </div>
+      </header>
+
+      <!-- Main Body -->
+      <main class="page-container">
+        
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">
+              <i class="fa-solid fa-pen-ruler text-warning"></i>
+              <span>Content Authoring & Customization Studio</span>
+            </h1>
+            <p class="page-subtitle">Design gamified quizzes, custom physics parameters, and interactive courses.</p>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary btn-sm" onclick="switchTab('quiz-builder')">
+              <i class="fa-solid fa-plus"></i> New Quiz Builder
+            </button>
+          </div>
+        </div>
+
+        <!-- Studio Navigation Tabs -->
+        <div class="authoring-tabs">
+          <div class="author-tab-btn active" onclick="switchTab('my-content')" id="tab-btn-my-content">
+            <i class="fa-solid fa-folder-open"></i> My Content
+          </div>
+          <div class="author-tab-btn" onclick="switchTab('quiz-builder')" id="tab-btn-quiz-builder">
+            <i class="fa-solid fa-hammer"></i> Interactive Quiz Builder
+          </div>
+          <div class="author-tab-btn" onclick="switchTab('templates')" id="tab-btn-templates">
+            <i class="fa-solid fa-cubes"></i> Lesson Templates
+          </div>
+          <div class="author-tab-btn" onclick="switchTab('media-library')" id="tab-btn-media-library">
+            <i class="fa-solid fa-photo-film"></i> Media Library
+          </div>
+        </div>
+
+        <!-- TAB 1: My Content -->
+        <div class="tab-content active" id="tab-my-content">
+          <!-- Quick create cards -->
+          <div class="content-types-grid">
+            <div class="glass-card content-type-card" onclick="switchTab('quiz-builder')">
+              <div class="content-type-icon" style="color: var(--primary);">🎯</div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Gamified Quiz</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary);">Timer, XP reward & badges</p>
+            </div>
+
+            <div class="glass-card content-type-card" onclick="showToast('Simulation authoring sandbox loaded!', 'info')">
+              <div class="content-type-icon" style="color: var(--accent);">🧪</div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Physics Lab</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary);">Custom variables & slider hooks</p>
+            </div>
+
+            <div class="glass-card content-type-card" onclick="showToast('Course curriculum builder opened!', 'info')">
+              <div class="content-type-icon" style="color: var(--secondary);">🎓</div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 0.35rem;">Full Course</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary);">Multi-module lesson accordion</p>
+            </div>
+
+            <div class="glass-card content-type-card" onclick="showToast('Article editor ready.', 'info')">
+              <div class="content-type-icon" style="color: var(--gold);">📝</div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 0.35rem;">STEM Article</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary);">Markdown, formulas & diagrams</p>
+            </div>
+          </div>
+
+          <!-- My Drafts & Published Grid -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.35rem;">Authored Challenges & Curricula</h2>
+            <span class="badge badge-primary">3 Active Items</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;" id="author-drafts-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- TAB 2: Quiz Builder (Interactive Engine) -->
+        <div class="tab-content" id="tab-quiz-builder">
+          <div class="builder-layout-grid">
+            
+            <!-- Left: Builder Controls -->
+            <div class="glass-card" style="padding: 2rem;">
+              <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-sliders text-primary-light"></i> Quiz Configuration
+              </h3>
+
+              <div class="form-group">
+                <label class="form-label">Quiz Title</label>
+                <input type="text" id="builder-title" class="form-input" placeholder="e.g. Relativistic Electrodynamics Sprint" value="Linear Algebra & Matrix Transformations">
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label">Subject</label>
+                  <select id="builder-subject" class="form-select">
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Programming">Programming</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Science">Chemistry/Bio</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Difficulty</label>
+                  <select id="builder-difficulty" class="form-select">
+                    <option value="Easy">Easy (100 XP)</option>
+                    <option value="Medium" selected>Medium (200 XP)</option>
+                    <option value="Hard">Hard (350 XP)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                <div class="form-group">
+                  <label class="form-label">Time Limit (Mins)</label>
+                  <input type="number" id="builder-time" class="form-input" value="5" min="1" max="60">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Passing Score (%)</label>
+                  <input type="number" id="builder-pass" class="form-input" value="75" min="50" max="100">
+                </div>
+              </div>
+
+              <!-- Question Creator Block -->
+              <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                <h4 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent);">+ Add Question to Pool</h4>
+
+                <div class="form-group">
+                  <label class="form-label">Question Text</label>
+                  <textarea id="builder-q-text" class="form-textarea" rows="3" placeholder="Enter problem statement..."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Options (Select radio for correct answer):</label>
+                  
+                  <div class="builder-opt-row">
+                    <input type="radio" name="correct_opt" value="0" checked style="accent-color: var(--accent);">
+                    <input type="text" class="form-input opt-input" placeholder="Option A" value="Determinant is non-zero (det ≠ 0)">
+                  </div>
+
+                  <div class="builder-opt-row">
+                    <input type="radio" name="correct_opt" value="1" style="accent-color: var(--accent);">
+                    <input type="text" class="form-input opt-input" placeholder="Option B" value="All eigenvalues are strictly zero">
+                  </div>
+
+                  <div class="builder-opt-row">
+                    <input type="radio" name="correct_opt" value="2" style="accent-color: var(--accent);">
+                    <input type="text" class="form-input opt-input" placeholder="Option C" value="Matrix rank equals 0">
+                  </div>
+
+                  <div class="builder-opt-row">
+                    <input type="radio" name="correct_opt" value="3" style="accent-color: var(--accent);">
+                    <input type="text" class="form-input opt-input" placeholder="Option D" value="Matrix must be diagonal">
+                  </div>
+                </div>
+
+                <button type="button" class="btn btn-accent" id="add-question-btn" style="width: 100%;">
+                  <i class="fa-solid fa-plus"></i> Add Question to Quiz List
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Right: Live Question List & Preview -->
+            <div>
+              <div class="glass-card" style="padding: 1.75rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                  <h3 style="font-size: 1.15rem;">Questions in Quiz</h3>
+                  <span class="badge badge-primary" id="builder-qcount-badge">2 Questions</span>
+                </div>
+
+                <div id="builder-questions-preview-list">
+                  <!-- Dynamically rendered question items -->
+                </div>
+              </div>
+
+              <!-- Action Bar -->
+              <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-outline" style="flex: 1;" onclick="previewQuizExperience()">
+                  <i class="fa-regular fa-eye"></i> Student Preview
+                </button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="saveAndPublishQuiz()">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Publish Quiz
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 3: Templates -->
+        <div class="tab-content" id="tab-templates">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+            <div class="glass-card" style="padding: 1.75rem;">
+              <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Physics Template</span>
+              <h3 style="font-size: 1.2rem; margin-bottom: 0.4rem;">Kinematics Lab & Quiz</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                Includes pre-configured friction track, velocity vectors, and 5 conceptual questions.
+              </p>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Template cloned to draft!', 'success')">Clone Template</button>
+            </div>
+
+            <div class="glass-card" style="padding: 1.75rem;">
+              <span class="badge badge-accent" style="margin-bottom: 0.5rem;">Coding Template</span>
+              <h3 style="font-size: 1.2rem; margin-bottom: 0.4rem;">Data Structures Battle</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                Pre-built Big-O algorithm challenges with automated test cases and timer loops.
+              </p>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Template cloned to draft!', 'success')">Clone Template</button>
+            </div>
+
+            <div class="glass-card" style="padding: 1.75rem;">
+              <span class="badge badge-gold" style="margin-bottom: 0.5rem;">Chemistry Template</span>
+              <h3 style="font-size: 1.2rem; margin-bottom: 0.4rem;">Acid-Base Titration</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                Interactive burette drop simulator with real-time pH indicator color transitions.
+              </p>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Template cloned to draft!', 'success')">Clone Template</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: Media Library -->
+        <div class="tab-content" id="tab-media-library">
+          <div class="upload-dropzone" onclick="document.getElementById('file-upload-input').click()">
+            <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileUpload(this)">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3rem; color: var(--primary-light); margin-bottom: 1rem;"></i>
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.35rem;">Drag & Drop STEM Assets</h3>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Support for SVG diagrams, 3D glTF models, audio explanations & PNG thumbnails</p>
+          </div>
+
+          <h3 style="font-size: 1.2rem; margin-bottom: 1.25rem;">Asset Gallery</h3>
+          <div class="media-grid">
+            <div class="glass-card media-card">
+              <div class="media-thumb-box"><i class="fa-solid fa-atom"></i></div>
+              <div style="font-weight: 600; font-size: 0.85rem;">bohr_model.svg</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">142 KB • Vector</div>
+            </div>
+
+            <div class="glass-card media-card">
+              <div class="media-thumb-box" style="color: var(--accent);"><i class="fa-solid fa-dna"></i></div>
+              <div style="font-weight: 600; font-size: 0.85rem;">dna_double_helix.svg</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">88 KB • Vector</div>
+            </div>
+
+            <div class="glass-card media-card">
+              <div class="media-thumb-box" style="color: var(--secondary);"><i class="fa-solid fa-microchip"></i></div>
+              <div style="font-weight: 600; font-size: 0.85rem;">cpu_schematic.png</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">2.1 MB • Image</div>
+            </div>
+
+            <div class="glass-card media-card">
+              <div class="media-thumb-box" style="color: var(--gold);"><i class="fa-solid fa-chart-line"></i></div>
+              <div style="font-weight: 600; font-size: 0.85rem;">derivative_curves.svg</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">64 KB • Vector</div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Student Experience Preview Modal -->
+  <div class="modal-overlay" id="preview-modal">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <div>
+          <span class="badge badge-accent">STUDENT SIMULATION PREVIEW</span>
+          <h3 class="modal-title" id="preview-quiz-title">Quiz Preview</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('preview-modal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <span class="badge badge-primary">Question 1 of 2</span>
+          <span style="color: var(--secondary); font-weight: 700;"><i class="fa-regular fa-clock"></i> 05:00</span>
+        </div>
+
+        <h3 id="preview-q-text" style="font-size: 1.15rem; margin-bottom: 1.5rem; line-height: 1.5;">
+          What condition guarantees that a square matrix A has an inverse?
+        </h3>
+
+        <div id="preview-options-box">
+          <!-- Preview buttons -->
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+          <button class="btn btn-outline" onclick="closeModal('preview-modal')">Close Preview</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    // State for builder questions
+    let builderQuestions = [
+      {
+        text: 'What condition guarantees that an n x n square matrix A has an inverse?',
+        options: [
+          'Determinant is non-zero (det ≠ 0)',
+          'All eigenvalues are strictly zero',
+          'Matrix rank equals 0',
+          'Matrix must be diagonal'
+        ],
+        correctIndex: 0
+      },
+      {
+        text: 'What is the geometric interpretation of the dot product A • B = 0 for non-zero vectors?',
+        options: [
+          'Vectors are orthogonal (perpendicular)',
+          'Vectors are parallel and point in the same direction',
+          'Vectors have infinite magnitude',
+          'Vectors form an equilateral triangle'
+        ],
+        correctIndex: 0
+      }
+    ];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      checkAuth(true);
+      initNavUser();
+
+      await loadAuthorDrafts();
+      renderBuilderQuestions();
+      setupAddQuestion();
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.author-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      const activeContent = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      if (activeContent) activeContent.classList.add('active');
+    }
+
+    async function loadAuthorDrafts() {
+      const drafts = await EduPlayAPI.getAuthorContent();
+      const container = document.getElementById('author-drafts-container');
+
+      container.innerHTML = drafts.map(d => {
+        let statusBadge = 'badge-accent';
+        if (d.status === 'Draft') statusBadge = 'badge-warning';
+        if (d.status === 'Review') statusBadge = 'badge-primary';
+
+        return `
+          <div class="glass-card" style="padding: 1.75rem; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="badge ${statusBadge}">${d.status}</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">${d.type}</span>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">${d.title}</h3>
+            <p style="font-size: 0.825rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+              ${d.questions} Questions • Updated ${d.updated_at}
+            </p>
+            <div style="margin-top: auto; display: flex; gap: 0.5rem;">
+              <button class="btn btn-outline btn-sm" style="flex: 1;" onclick="switchTab('quiz-builder')">Edit</button>
+              <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="previewQuizExperience()">Preview</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderBuilderQuestions() {
+      const container = document.getElementById('builder-questions-preview-list');
+      const badge = document.getElementById('builder-qcount-badge');
+      if (badge) badge.textContent = `${builderQuestions.length} Questions`;
+
+      if (builderQuestions.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem;">No questions added yet. Use the form on the left to add questions!</div>';
+        return;
+      }
+
+      container.innerHTML = builderQuestions.map((q, idx) => `
+        <div class="builder-question-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <span style="font-weight: 700; color: var(--primary-light); font-size: 0.9rem;">#${idx + 1}</span>
+            <button class="btn-icon-only" style="width: 28px; height: 28px; color: var(--danger); font-size: 0.85rem;" onclick="removeQuestion(${idx})">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+          <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.75rem; color: #FFFFFF;">${q.text}</div>
+          <div style="font-size: 0.825rem; color: var(--text-secondary);">
+            Correct Answer: <strong style="color: var(--accent);">${q.options[q.correctIndex]}</strong>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setupAddQuestion() {
+      const addBtn = document.getElementById('add-question-btn');
+      addBtn.addEventListener('click', () => {
+        const text = document.getElementById('builder-q-text').value.trim();
+        if (!text) {
+          showToast('Please enter question text.', 'error');
+          return;
+        }
+
+        const optInputs = document.querySelectorAll('.opt-input');
+        const options = Array.from(optInputs).map(inp => inp.value.trim());
+        const selectedRadio = document.querySelector('input[name="correct_opt"]:checked');
+        const correctIndex = parseInt(selectedRadio ? selectedRadio.value : '0');
+
+        builderQuestions.push({
+          text,
+          options,
+          correctIndex
+        });
+
+        document.getElementById('builder-q-text').value = '';
+        renderBuilderQuestions();
+        showToast('Question added to quiz pool!', 'success');
+      });
+    }
+
+    function removeQuestion(index) {
+      builderQuestions.splice(index, 1);
+      renderBuilderQuestions();
+      showToast('Question removed.', 'info');
+    }
+
+    function previewQuizExperience() {
+      if (builderQuestions.length === 0) {
+        showToast('Add at least 1 question to preview!', 'error');
+        return;
+      }
+
+      const q = builderQuestions[0];
+      document.getElementById('preview-quiz-title').textContent = document.getElementById('builder-title').value;
+      document.getElementById('preview-q-text').textContent = q.text;
+
+      const optBox = document.getElementById('preview-options-box');
+      optBox.innerHTML = q.options.map((opt, idx) => `
+        <div style="padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: rgba(255,255,255,0.04); margin-bottom: 0.5rem; cursor: pointer;" onclick="showToast('Option clicked in student mode', 'info', 1000)">
+          ${opt}
+        </div>
+      `).join('');
+
+      openModal('preview-modal');
+    }
+
+    async function saveAndPublishQuiz() {
+      const title = document.getElementById('builder-title').value.trim();
+      const subject = document.getElementById('builder-subject').value;
+
+      if (!title || builderQuestions.length === 0) {
+        showToast('Please provide a title and at least one question.', 'error');
+        return;
+      }
+
+      const newContent = await EduPlayAPI.saveAuthorContent({
+        title,
+        type: 'Quiz',
+        status: 'Published',
+        questions: builderQuestions
+      });
+
+      showToast(`Quiz "${title}" published live to platform! 🚀`, 'success');
+      await loadAuthorDrafts();
+      switchTab('my-content');
+    }
+
+    function handleFileUpload(input) {
+      if (input.files && input.files[0]) {
+        showToast(`Asset "${input.files[0].name}" uploaded to Media Library!`, 'success');
+      }
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+  </script>
+</body>
+</html>

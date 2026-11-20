@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduPlay - UnityLearn | Gamified Learning Experience Platform</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Main CSS Design System -->
+  <link rel="stylesheet" href="css/main.css">
+
+  <style>
+    /* Landing-specific styles */
+    .hero-section {
+      min-height: 100vh;
+      padding: 140px 1.5rem 80px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 3.5rem;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-content h1 {
+      font-size: 3.8rem;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+      max-width: 580px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    /* 3D Floating Interactive Art Display */
+    .hero-visual {
+      position: relative;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-cube-wrap {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle at 30% 30%, rgba(108, 99, 255, 0.4), rgba(255, 101, 132, 0.2));
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(108, 99, 255, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: float 6s ease-in-out infinite;
+      position: relative;
+    }
+
+    .hero-cube-icon {
+      font-size: 4.5rem;
+      background: linear-gradient(135deg, #6C63FF, #FF6584, #43E97B);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+
+    /* Floating Badges surrounding central element */
+    .floating-card-1 {
+      position: absolute;
+      top: 15px;
+      left: -25px;
+      padding: 0.85rem 1.25rem;
+      animation: floatReverse 7s ease-in-out infinite;
+      z-index: 3;
+    }
+
+    .floating-card-2 {
+      position: absolute;
+      bottom: 25px;
+      right: -25px;
+      padding: 0.85rem 1.25rem;
+      animation: float 5.5s ease-in-out infinite;
+      z-index: 3;
+    }
+
+    .floating-card-3 {
+      position: absolute;
+      bottom: -15px;
+      left: 30px;
+      padding: 0.65rem 1.1rem;
+      animation: float 8s ease-in-out infinite;
+      z-index: 3;
+    }
+
+    /* Particle Background Canvas */
+    #particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Stats Bar */
+    .stats-section {
+      position: relative;
+      z-index: 2;
+      padding: 1.5rem 0 3.5rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.5rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(16px);
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Section Headers */
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 3.5rem;
+    }
+
+    .section-header h2 {
+      font-size: 2.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+    }
+
+    /* Modules Grid */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 5rem;
+    }
+
+    .module-card {
+      padding: 2.25rem;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius-lg);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .module-icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .module-card h3 {
+      font-size: 1.35rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .module-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+
+    .module-card .module-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--primary-light);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .module-card:hover .module-link {
+      color: #FFFFFF;
+      gap: 0.8rem;
+    }
+
+    /* How It Works Steps */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      position: relative;
+      margin-bottom: 6rem;
+    }
+
+    .step-card {
+      padding: 2.2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-badge {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.3rem;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-bottom: 6rem;
+    }
+
+    .testimonial-card {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .testimonial-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    /* CTA Section */
+    .cta-banner {
+      background: radial-gradient(circle at 50% 50%, rgba(108, 99, 255, 0.25) 0%, rgba(15, 15, 26, 0.8) 100%), var(--bg-surface);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      padding: 4.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(108, 99, 255, 0.2);
+      margin-bottom: 6rem;
+    }
+
+    .cta-banner h2 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .cta-banner p {
+      color: var(--text-secondary);
+      font-size: 1.15rem;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* Footer */
+    .landing-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 3.5rem 0 2rem;
+      background: rgba(9, 9, 16, 0.9);
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-bottom {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    @media (max-width: 992px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-subtitle {
+        margin: 0 auto 2.5rem;
+      }
+      .hero-cta-group {
+        justify-content: center;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .modules-grid, .steps-grid, .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-content h1 {
+        font-size: 2.5rem;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .footer-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Particle Animation Canvas -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Navigation Bar -->
+  <header class="landing-nav">
+    <div class="landing-nav-container">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-icon">
+          <i class="fa-solid fa-gamepad"></i>
+        </div>
+        <span>EduPlay<span style="color: var(--primary); font-weight: 300;"> - UnityLearn</span></span>
+      </a>
+
+      <nav class="landing-nav-links">
+        <a href="#features">Features</a>
+        <a href="#modules">6 Modules</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#testimonials">Reviews</a>
+      </nav>
+
+      <div class="landing-nav-actions">
+        <a href="login.html" class="btn btn-outline btn-sm">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </a>
+        <a href="register.html" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-rocket"></i> Sign Up
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero-section">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="badge badge-accent" style="margin-bottom: 1.25rem;">
+            <i class="fa-solid fa-sparkles"></i> NEXT-GEN GAMIFIED LEARNING
+          </div>
+          <h1>Level Up Your <span class="gradient-text">Learning Journey</span></h1>
+          <p class="hero-subtitle">
+            Experience the fusion of gaming psychology and cutting-edge STEM education. 
+            Earn XP, master interactive physics simulations, follow AI-driven adaptive paths, 
+            and battle on global leaderboards.
+          </p>
+          <div class="hero-cta-group">
+            <a href="register.html" class="btn btn-primary btn-lg">
+              <i class="fa-solid fa-play"></i> Start Learning Free
+            </a>
+            <a href="dashboard.html?demo=true" class="btn btn-outline btn-lg">
+              <i class="fa-solid fa-compass"></i> Explore Live Demo
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <!-- Central Hologram Card -->
+          <div class="hero-cube-wrap">
+            <div class="hero-cube-icon">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h4 style="font-weight: 700; font-size: 1.2rem;">Quest Completed!</h4>
+            <p style="color: var(--accent); font-weight: 600; font-size: 0.9rem;">+250 XP Awarded</p>
+          </div>
+
+          <!-- Floating Badges -->
+          <div class="glass-card floating-card-1">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span style="font-size: 1.6rem;">⚡</span>
+              <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Current Streak</div>
+                <div style="font-weight: 700; color: #FFFFFF;">7 Days Active 🔥</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card floating-card-2">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span style="font-size: 1.6rem;">🥇</span>
+              <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Leaderboard</div>
+                <div style="font-weight: 700; color: #FFFFFF;">Rank #4 Worldwide</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card floating-card-3">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <span style="font-size: 1.4rem;">🧪</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--accent);">Newton Lab 60 FPS</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Frictionless Simulation</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-section">
+      <div style="max-width: 1240px; margin: 0 auto; padding: 0 1.5rem;">
+        <div class="stats-grid">
+          <div>
+            <div class="stat-number gradient-text">10,000+</div>
+            <div class="stat-label">Active Students</div>
+          </div>
+          <div>
+            <div class="stat-number gradient-text-alt">500+</div>
+            <div class="stat-label">Courses & Quests</div>
+          </div>
+          <div>
+            <div class="stat-number gradient-text-cyan">6</div>
+            <div class="stat-label">Core Modules</div>
+          </div>
+          <div>
+            <div class="stat-number gradient-text">95%</div>
+            <div class="stat-label">Success Rate</div>
+          </div>
+          <div>
+            <div class="stat-number gradient-text-alt">2.5M+</div>
+            <div class="stat-label">XP Earned</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features & Modules Section -->
+    <section id="modules" style="padding: 5rem 0;">
+      <div style="max-width: 1240px; margin: 0 auto; padding: 0 1.5rem;">
+        <div class="section-header">
+          <div class="badge badge-primary" style="margin-bottom: 0.75rem;">THE FULL ECOSYSTEM</div>
+          <h2>Six Specialized Learning Modules</h2>
+          <p>Everything you need to transform theoretical education into an exhilarating game of discovery and mastery.</p>
+        </div>
+
+        <div class="modules-grid">
+          <!-- Module 1 -->
+          <div class="glass-card module-card glass-card-glow">
+            <div class="module-icon-wrap" style="background: rgba(108, 99, 255, 0.15); color: #8E87FF;">
+              <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <h3>1. Game-Based Learning</h3>
+            <p>Earn XP, unlock rare badges, tackle timed quizzes, and climb dynamic global and regional leaderboards.</p>
+            <a href="pages/game-learning.html" class="module-link">
+              Explore Quizzes <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <!-- Module 2 -->
+          <div class="glass-card module-card glass-card-glow">
+            <div class="module-icon-wrap" style="background: rgba(67, 233, 123, 0.15); color: #43E97B;">
+              <i class="fa-solid fa-flask-vial"></i>
+            </div>
+            <h3>2. Interactive Simulations</h3>
+            <p>Virtual physics engines, circuit simulators, and interactive biology cell models with real-time sliders and graphs.</p>
+            <a href="pages/simulations.html" class="module-link">
+              Launch Labs <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <!-- Module 3 -->
+          <div class="glass-card module-card glass-card-glow">
+            <div class="module-icon-wrap" style="background: rgba(255, 101, 132, 0.15); color: #FF6584;">
+              <i class="fa-solid fa-compass"></i>
+            </div>
+            <h3>3. Adaptive Learning Paths</h3>
+            <p>AI-driven skill diagnostic trees that continuously calibrate to your strengths, suggesting the optimal roadmap.</p>
+            <a href="pages/learning-paths.html" class="module-link">
+              View Roadmaps <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <!-- Module 4 -->
+          <div class="glass-card module-card glass-card-glow">
+            <div class="module-icon-wrap" style="background: rgba(56, 182, 255, 0.15); color: #38B6FF;">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <h3>4. Collaborative Learning</h3>
+            <p>Join focused study guilds, discuss tough challenges in community forums, and conduct structured peer code reviews.</p>
+            <a href="pages/collaborative.html" class="module-link">
+              Join Guilds <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <!-- Module 5 -->
+          <div class="glass-card module-card glass-card-glow">
+            <div class="module-icon-wrap" style="background: rgba(255, 215, 0, 0.15); color: #FFD700;">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <h3>5. Performance Analytics</h3>
+            <p>Comprehensive telemetry featuring study heatmaps, subject radars, streak counters, and downloadable performance reports.</p>
+            <a href="pages/analytics.html" class="module-link">
+              View Insights <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <!-- Module 6 -->
+          <div class="glass-card module-card glass-card-glow">
+            <div class="module-icon-wrap" style="background: rgba(255, 160, 122, 0.15); color: #FFA07A;">
+              <i class="fa-solid fa-pen-ruler"></i>
+            </div>
+            <h3>6. Content Authoring</h3>
+            <p>Empower educators and creators with no-code quiz creators, multimedia libraries, and interactive lesson template builders.</p>
+            <a href="pages/authoring.html" class="module-link">
+              Create Content <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" style="padding: 5rem 0; background: rgba(255, 255, 255, 0.015);">
+      <div style="max-width: 1240px; margin: 0 auto; padding: 0 1.5rem;">
+        <div class="section-header">
+          <div class="badge badge-accent" style="margin-bottom: 0.75rem;">SEAMLESS ONBOARDING</div>
+          <h2>How EduPlay Works</h2>
+          <p>Three straightforward steps to embark on your gamified quest for mastery.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="glass-card step-card">
+            <div class="step-badge">1</div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Build Your Hero Persona</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+              Sign up in seconds, configure your learning goals, and take a quick diagnostic check to calibrate your skill level.
+            </p>
+          </div>
+
+          <div class="glass-card step-card">
+            <div class="step-badge">2</div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Conquer Hands-On Quests</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+              Interact with real-time physics simulations, answer adaptive quizzes, earn streak multipliers, and gain XP.
+            </p>
+          </div>
+
+          <div class="glass-card step-card">
+            <div class="step-badge">3</div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Dominate the Leaderboard</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+              Climb the ranks, unlock legendary badges, collaborate with peer study groups, and earn verified STEM badges.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" style="padding: 5rem 0;">
+      <div style="max-width: 1240px; margin: 0 auto; padding: 0 1.5rem;">
+        <div class="section-header">
+          <div class="badge badge-secondary" style="margin-bottom: 0.75rem;">STUDENT VOICES</div>
+          <h2>Loved by 10,000+ Curious Minds</h2>
+          <p>Hear how gamification has transformed how students understand STEM concepts.</p>
+        </div>
+
+        <div class="testimonials-grid">
+          <div class="glass-card testimonial-card">
+            <div>
+              <div class="star-rating" style="margin-bottom: 1rem;">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+              </div>
+              <p style="color: var(--text-secondary); font-style: italic; font-size: 0.95rem;">
+                "The interactive Ohm's Law and Newton simulations made physics click for me in ways textbooks never could. 
+                I'm actually excited to do homework every single evening!"
+              </p>
+            </div>
+            <div class="testimonial-user">
+              <div class="user-avatar" style="background: linear-gradient(135deg, #FF6584, #FFA07A);">ER</div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">Elena Rostova</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Computer Science Sophomore</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card testimonial-card">
+            <div>
+              <div class="star-rating" style="margin-bottom: 1rem;">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+              </div>
+              <p style="color: var(--text-secondary); font-style: italic; font-size: 0.95rem;">
+                "The streak mechanism and weekly leaderboard completely cured my procrastination. 
+                My study group competes every weekend on the algorithm quizzes."
+              </p>
+            </div>
+            <div class="testimonial-user">
+              <div class="user-avatar" style="background: linear-gradient(135deg, #6C63FF, #38B6FF);">KT</div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">Kai Takahashi</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Data Science Junior</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card testimonial-card">
+            <div>
+              <div class="star-rating" style="margin-bottom: 1rem;">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+              </div>
+              <p style="color: var(--text-secondary); font-style: italic; font-size: 0.95rem;">
+                "As an instructor, the Quiz Builder and instant analytics dashboard allow me to see 
+                in real time which concepts my students struggle with before exams."
+              </p>
+            </div>
+            <div class="testimonial-user">
+              <div class="user-avatar" style="background: linear-gradient(135deg, #43E97B, #38EF7D);">SJ</div>
+              <div>
+                <h4 style="font-size: 0.95rem; font-weight: 700;">Dr. Sarah Jenkins</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Assistant Professor of Physics</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Banner -->
+        <div class="cta-banner">
+          <h2>Ready to Level Up Your Mind?</h2>
+          <p>Join thousands of learners unlocking their peak potential with gamified experiential education.</p>
+          <div style="display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap;">
+            <a href="register.html" class="btn btn-primary btn-lg">
+              <i class="fa-solid fa-bolt"></i> Create Free Account
+            </a>
+            <a href="login.html" class="btn btn-outline btn-lg">
+              <i class="fa-solid fa-right-to-bracket"></i> Student Login
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="footer-container">
+      <div>
+        <div class="nav-brand" style="margin-bottom: 1rem;">
+          <div class="nav-brand-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+          <span>EduPlay<span style="color: var(--primary);"> - UnityLearn</span></span>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 340px; margin-bottom: 1.5rem;">
+          The ultimate gamified STEM platform blending game loops, live simulations, and social learning.
+        </p>
+        <div style="display: flex; gap: 1rem;">
+          <a href="#" class="icon-btn"><i class="fa-brands fa-github"></i></a>
+          <a href="#" class="icon-btn"><i class="fa-brands fa-discord"></i></a>
+          <a href="#" class="icon-btn"><i class="fa-brands fa-x-twitter"></i></a>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Modules</h4>
+        <ul style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.9rem; color: var(--text-secondary);">
+          <li><a href="pages/game-learning.html">Game-Based Quizzes</a></li>
+          <li><a href="pages/simulations.html">Physics & Science Labs</a></li>
+          <li><a href="pages/learning-paths.html">Adaptive Learning Paths</a></li>
+          <li><a href="pages/collaborative.html">Study Groups & Forum</a></li>
+          <li><a href="pages/analytics.html">Performance Telemetry</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Platform</h4>
+        <ul style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.9rem; color: var(--text-secondary);">
+          <li><a href="dashboard.html">Student Dashboard</a></li>
+          <li><a href="pages/authoring.html">Content Authoring</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="login.html">Sign In</a></li>
+          <li><a href="register.html">Sign Up</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="font-size: 1rem; margin-bottom: 1.25rem;">Community</h4>
+        <ul style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.9rem; color: var(--text-secondary);">
+          <li><a href="pages/collaborative.html">Discussion Forums</a></li>
+          <li><a href="pages/game-learning.html">Global Leaderboard</a></li>
+          <li><a href="#">Discord Guild</a></li>
+          <li><a href="#">Academic Integrity</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2024 EduPlay - UnityLearn. All rights reserved. Gamified STEM Learning Platform.</div>
+      <div>Designed with Pure Dark Glassmorphism</div>
+    </div>
+  </footer>
+
+  <!-- Background Particle Animation Script -->
+  <script>
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2.5 + 0.8;
+        this.speedX = (Math.random() - 0.5) * 0.45;
+        this.speedY = (Math.random() - 0.5) * 0.45;
+        this.color = Math.random() > 0.5 ? 'rgba(108, 99, 255, ' : 'rgba(255, 101, 132, ';
+        this.alpha = Math.random() * 0.5 + 0.15;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+      }
+      draw() {
+        ctx.fillStyle = this.color + this.alpha + ')';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.floor((canvas.width * canvas.height) / 18000);
+      for (let i = 0; i < Math.min(count, 80); i++) {
+        particles.push(new Particle());
+      }
+    }
+    initParticles();
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // Intersection Observer for smooth reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in-up');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.module-card, .step-card, .testimonial-card').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
